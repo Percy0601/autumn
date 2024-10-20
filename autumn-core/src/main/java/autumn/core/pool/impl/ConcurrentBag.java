@@ -113,9 +113,11 @@ public class ConcurrentBag implements AutoCloseable {
 
     public void removeByIp(String ip) {
         sharedList.forEach(it -> {
-            
+            if(it.getIp().equals(ip)) {
+                it.setState(ConcurrentBagEntry.STATE_REMOVED);
+                sharedList.remove(it);
+                it.close();
+            }
         });
-
-
     }
 }

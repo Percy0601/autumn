@@ -1,17 +1,13 @@
 package autumn.core.pool;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.thrift.TServiceClient;
-import org.apache.thrift.transport.TTransport;
-
-import autumn.core.config.ReferenceConfig;
 import autumn.core.pool.impl.ConcurrentBag;
 import autumn.core.pool.impl.ConcurrentBagEntry;
 
 public final class AutumnPool {
     private volatile static AutumnPool singleton = null;
-    private ConcurrentHashMap<String, ReferenceConfig<? extends TServiceClient>> configMapping;
     private ConcurrentHashMap<String, ConcurrentBag> bagMapping;
     private ConcurrentHashMap<String, ConcurrentBagEntry> mapping;
     private AutumnPool() {
@@ -19,7 +15,6 @@ public final class AutumnPool {
     }
 
     private void init() {
-        configMapping = new ConcurrentHashMap();
         mapping = new ConcurrentHashMap<>();
     }
 
@@ -36,23 +31,38 @@ public final class AutumnPool {
         return singleton;
     }
 
+    public ConcurrentBagEntry borrow(String service) {
+        if(!bagMapping.contains(service)) {
+
+        }
+        ConcurrentBag bag = bagMapping.get(service);
+        try {
+            ConcurrentBagEntry entry = bag.borrow(1, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        return null;
+    }
 
     public void remove(String service, String ip) {
         ConcurrentBag bag = bagMapping.get(service);
         bag.removeByIp(ip);
 
-
         mapping.forEach((k, v) -> {
             if(!service.contains(v.getService())) {
                 return;
             }
-
+            if(!v.getIp().equals(ip)) {
+                return;
+            }
+            if(v.getState() == ConcurrentBagEntry.STATE_REMOVED) {
+                return;
+            }
 
             ConcurrentBagEntry entry = v;
             v.setState(ConcurrentBagEntry.STATE_REMOVED);
+            v.close();
+            mapping.remove(k);
         });
-
-
-
     }
 }
