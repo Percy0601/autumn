@@ -76,23 +76,23 @@ public class ConcurrentBag implements AutoCloseable {
             return null;
         }
         List<ConsumerConfig> consumerConfigs = config.getInstances();
-
-
-        ConcurrentBagEntry entry = new ConcurrentBagEntryImpl<>();
-
-
+//        ConcurrentBagEntry entry = new ConcurrentBagEntryImpl<>();
 
         return null;
     }
 
     private ConsumerConfig getScaleConsumer(ReferenceConfig<? extends TServiceClient> config) {
-        if(mapping.size() < 1) {
-            return config.getInstances().get(0);
-        }
+        List<ConsumerConfig> consumerConfigs = config.getInstances();
 
 
-        Map<String, Long> group = mapping.values().stream()
-                .collect(Collectors.groupingBy(ConcurrentBagEntry::getIp, Collectors.counting()));
+//        Map<String, Integer> ipConnectionMapping = consumerConfigs.stream()
+//                .collect(Collectors.groupingBy(ConsumerConfig::getIp,
+//                        Collectors.summingInt(ConsumerConfig::getConnections)));
+//
+//        Map<String, Long> group = mapping.values().stream()
+//                .collect(Collectors.groupingBy(ConcurrentBagEntry::getIp, Collectors.counting()));
+//
+
 
         return null;
     }

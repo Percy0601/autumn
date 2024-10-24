@@ -1,5 +1,7 @@
 package autumn.core.config;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,5 +14,6 @@ public class ConsumerConfig {
     private String ip;
     private Integer port;
     private String label;
+    private AtomicInteger active;
     private Integer connections;
 }
