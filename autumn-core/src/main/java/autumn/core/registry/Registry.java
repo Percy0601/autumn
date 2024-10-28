@@ -5,6 +5,6 @@ package autumn.core.registry;
  * @date: 2024/10/28
  */
 public interface Registry {
-
-
+    Boolean register();
+    void shutdownHook();
 }
