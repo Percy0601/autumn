@@ -6,7 +6,6 @@ package autumn.core.registry;
  */
 public class ConsulRegistry implements Registry{
 
-
     @Override
     public Boolean register() {
         return null;

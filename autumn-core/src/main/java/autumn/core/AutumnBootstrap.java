@@ -1,5 +1,6 @@
 package autumn.core;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,13 +19,15 @@ import org.apache.thrift.transport.layered.TFramedTransport;
 
 import autumn.core.config.ApplicationConfig;
 import autumn.core.config.ConsulConfig;
+import autumn.core.config.ConsumerConfig;
 import autumn.core.config.ProviderConfig;
 import autumn.core.config.ReferenceConfig;
 import autumn.core.config.ServiceConfig;
-import autumn.core.registry.client.MulticastDiscovery;
 import autumn.core.extension.AttachableProcessor;
+import autumn.core.registry.client.Discovery;
 import autumn.core.util.AutumnException;
 import autumn.core.util.CommonUtil;
+import autumn.core.util.SpiUtil;
 import autumn.core.util.ThreadUtil;
 import lombok.Getter;
 import lombok.Setter;
@@ -138,7 +141,20 @@ public class AutumnBootstrap {
     }
 
     private void checkHealth() {
+        Runnable runnable = () -> {
+            Discovery discovery = SpiUtil.discovery();
+            List<String> services = discovery.services();
+            if(Objects.isNull(services) || services.size() < 1) {
+                return;
+            }
+            services.forEach(it -> {
+                List<ConsumerConfig> instances = discovery.getInstances(it);
 
+            });
+
+
+        };
+        ThreadUtil.getInstance().scheduleWithFixedDelay(runnable, 300L);
     }
 
     public void start() {
@@ -193,8 +209,8 @@ public class AutumnBootstrap {
     }
 
     public <T extends TServiceClient> AutumnBootstrap reference(ReferenceConfig<T> referenceConfig) {
-        MulticastDiscovery multicastDiscovery = MulticastDiscovery.getInstance();
-        multicastDiscovery.reference(referenceConfig.getInterfaceClass(), referenceConfig);
+        Discovery discovery = SpiUtil.discovery();
+        discovery.reference(referenceConfig.getInterfaceClass(), referenceConfig);
         return this;
     }
 

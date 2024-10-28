@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import org.apache.thrift.TServiceClient;
 
@@ -30,28 +31,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 public class MulticastDiscovery implements Discovery{
-    private volatile static MulticastDiscovery singleton = null;
+
     private ConcurrentHashMap<Class<? extends TServiceClient>, ReferenceConfig> refers = new ConcurrentHashMap<>();
     private AtomicBoolean initStatus = new AtomicBoolean(false);
     private MulticastSocket mc;
-    private MulticastDiscovery() {
-
+    public MulticastDiscovery() {
+        init();
     }
 
-    public static MulticastDiscovery getInstance() {
-        if (singleton == null) {
-            synchronized (AutumnPool.class) {
-                if (singleton == null) {
-                    singleton = new MulticastDiscovery();
-                    singleton.init();
-                    return singleton;
-                }
-            }
-        }
-        return singleton;
-    }
-
-    public void init() {
+    private void init() {
         if(Boolean.TRUE.equals(initStatus.get())) {
             return;
         }
@@ -67,7 +55,6 @@ public class MulticastDiscovery implements Discovery{
             throw new RuntimeException(e);
         }
     }
-
 
     private void addInstance(String name, ConsumerConfig consumerConfig) {
         if(!refers.contains(name)) {
@@ -164,6 +151,16 @@ public class MulticastDiscovery implements Discovery{
             return;
         }
         refers.put(classType, referenceConfig);
+    }
+
+    @Override
+    public List<String> services() {
+        List<String> services = refers.values()
+                .stream()
+                .map(ReferenceConfig::getName)
+                .distinct()
+                .collect(Collectors.toList());
+        return services;
     }
 
     @Override

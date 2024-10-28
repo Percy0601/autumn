@@ -1,11 +1,13 @@
 package autumn.core.registry.client;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.thrift.TServiceClient;
 
 import autumn.core.config.ConsumerConfig;
 import autumn.core.config.ReferenceConfig;
+import autumn.core.pool.AutumnPool;
 
 /**
  * @author: baoxin.zhao
@@ -18,8 +20,17 @@ public class ConsulDiscovery implements Discovery{
     }
 
     @Override
-    public List<ConsumerConfig> getInstances(String name) {
+    public List<String> services() {
         return List.of();
+    }
+
+    @Override
+    public List<ConsumerConfig> getInstances(String name) {
+        ReferenceConfig<? extends TServiceClient> config = AutumnPool.getInstance().getReferenceConfig(name);
+        if(Objects.isNull(config)) {
+            return null;
+        }
+        return config.getInstances();
     }
 
 }

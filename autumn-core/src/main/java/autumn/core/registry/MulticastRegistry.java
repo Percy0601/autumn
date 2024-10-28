@@ -5,11 +5,9 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import autumn.core.config.ApplicationConfig;
 import autumn.core.config.ProviderConfig;
-import autumn.core.pool.AutumnPool;
 import autumn.core.util.ConverterUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,30 +17,11 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class MulticastRegistry implements Registry{
-    private volatile static MulticastRegistry singleton = null;
-    private AtomicBoolean initStatus = new AtomicBoolean(false);
     private MulticastSocket mc;
-
-    private MulticastRegistry() {
-
-    }
-
-    public static MulticastRegistry getInstance() {
-        if (singleton == null) {
-            synchronized (AutumnPool.class) {
-                if (singleton == null) {
-                    singleton = new MulticastRegistry();
-
-                    return singleton;
-                }
-            }
-        }
-        return singleton;
-    }
 
     @Override
     public Boolean register() {
-        return singleton.init();
+        return init();
     }
 
     @Override
@@ -77,11 +56,6 @@ public class MulticastRegistry implements Registry{
     }
 
     private Boolean init() {
-        if(Boolean.TRUE.equals(initStatus.get())) {
-            return initStatus.get();
-        }
-
-        initStatus.compareAndSet(false, true);
         ApplicationConfig applicationConfig = ApplicationConfig.getInstance();
         String ip = applicationConfig.getMulticastIp();
         Integer port = applicationConfig.getMulticastPort();

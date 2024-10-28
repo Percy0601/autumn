@@ -15,5 +15,7 @@ public interface Discovery {
 
     <T extends TServiceClient> void reference(Class<T> classType, ReferenceConfig referenceConfig);
 
+    List<String> services();
+
     List<ConsumerConfig> getInstances(String name);
 }
