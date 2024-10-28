@@ -194,7 +194,7 @@ public class AutumnBootstrap {
 
     public <T extends TServiceClient> AutumnBootstrap reference(ReferenceConfig<T> referenceConfig) {
         MulticastDiscovery multicastDiscovery = MulticastDiscovery.getInstance();
-        multicastDiscovery.addRefer(referenceConfig.getInterfaceClass(), referenceConfig);
+        multicastDiscovery.reference(referenceConfig.getInterfaceClass(), referenceConfig);
         return this;
     }
 
