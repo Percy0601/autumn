@@ -28,7 +28,7 @@ public class MulticastRegistry implements Registry{
         String ip = applicationConfig.getMulticastIp();
         Integer port = applicationConfig.getMulticastPort();
         ProviderConfig config = ProviderConfig.getInstance();
-        String registryRequest = ConverterUtil.registryRequest(config);
+        String registryRequest = ConverterUtil.shutdownRequest(config);
         MulticastSocket mcs = null;
         InetAddress group = null;
         try {

@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 public class TrainingTest {
 
     @Test
-    void testConsumer() {
+    void testProvider() {
         log.info("========================");
         ServiceConfig<SomeService.Iface> fooServiceConfig = new ServiceConfig<>();
         fooServiceConfig.setInterfaceClass(SomeService.Iface.class);
@@ -28,17 +28,19 @@ public class TrainingTest {
         AttachableProcessor attachableProcessor = new AttachableProcessor(tprocessor);
         fooServiceConfig.setRef(attachableProcessor);
 
-        ReferenceConfig<SomeService.Client> referenceConfig = new ReferenceConfig<>();
-        referenceConfig.setName("training-a");
-        referenceConfig.setInterfaceClass(SomeService.Client.class);
-//        referenceConfig.setClient();
-        AutumnBootstrap autumnBootstrap = AutumnBootstrap.getInstance();
-        autumnBootstrap
-                .service(fooServiceConfig)
-                .reference(referenceConfig)
-                .start();
+        AutumnBootstrap.getInstance().serve();
 
-        SomeService.Client client;
+//        ReferenceConfig<SomeService.Client> referenceConfig = new ReferenceConfig<>();
+//        referenceConfig.setName("training-a");
+//        referenceConfig.setInterfaceClass(SomeService.Client.class);
+////        referenceConfig.setClient();
+//        AutumnBootstrap autumnBootstrap = AutumnBootstrap.getInstance();
+//        autumnBootstrap
+//                .service(fooServiceConfig)
+//                .reference(referenceConfig)
+//                .start();
+
+
 
     }
 

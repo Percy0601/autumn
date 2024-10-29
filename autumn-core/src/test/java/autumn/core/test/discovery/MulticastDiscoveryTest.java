@@ -15,8 +15,10 @@ import org.junit.jupiter.api.Test;
 
 import autumn.core.config.ApplicationConfig;
 import autumn.core.config.ProviderConfig;
+import autumn.core.registry.client.Discovery;
 import autumn.core.registry.client.MulticastDiscovery;
 import autumn.core.util.CommonUtil;
+import autumn.core.util.SpiUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -49,8 +51,8 @@ public class MulticastDiscoveryTest {
         applicationConfig.init(properties);
         ProviderConfig providerConfig = ProviderConfig.getInstance();
         providerConfig.init(properties);
-        MulticastDiscovery multicastDiscovery = MulticastDiscovery.getInstance();
-        multicastDiscovery.init();
+        Discovery multicastDiscovery = SpiUtil.discovery();
+        multicastDiscovery.reference(null, null);
 
         try {
             System.in.read();
