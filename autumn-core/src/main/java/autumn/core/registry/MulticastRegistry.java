@@ -17,8 +17,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class MulticastRegistry implements Registry{
-    private MulticastSocket mc;
-
     @Override
     public Boolean register() {
         return init();
@@ -60,7 +58,6 @@ public class MulticastRegistry implements Registry{
         String ip = applicationConfig.getMulticastIp();
         Integer port = applicationConfig.getMulticastPort();
         try {
-            mc = new MulticastSocket(port);
             InetAddress group = InetAddress.getByName(ip);
             MulticastSocket mcs = new MulticastSocket(port);
             registry(mcs, group, port);
