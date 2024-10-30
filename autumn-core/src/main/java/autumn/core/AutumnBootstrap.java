@@ -124,6 +124,8 @@ public class AutumnBootstrap {
             services.forEach(it -> {
                 List<ConsumerConfig> instances = discovery.getInstances(it);
 
+
+
             });
 
         };
@@ -157,6 +159,8 @@ public class AutumnBootstrap {
             controlApiService.setRef(attachableProcessor);
             service(controlApiService);
             server = new TThreadedSelectorServer(tArgs);
+//            Thread thread = new Thread();
+//            thread.
             server.serve();
             log.info("autumn server running");
         } catch (TTransportException e) {
