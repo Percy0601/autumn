@@ -1,5 +1,7 @@
 package autumn.api.test;
 
+import java.io.IOException;
+
 import org.apache.thrift.TProcessor;
 import org.junit.jupiter.api.Test;
 
@@ -30,17 +32,11 @@ public class TrainingTest {
 
         AutumnBootstrap.getInstance().serve();
 
-//        ReferenceConfig<SomeService.Client> referenceConfig = new ReferenceConfig<>();
-//        referenceConfig.setName("training-a");
-//        referenceConfig.setInterfaceClass(SomeService.Client.class);
-////        referenceConfig.setClient();
-//        AutumnBootstrap autumnBootstrap = AutumnBootstrap.getInstance();
-//        autumnBootstrap
-//                .service(fooServiceConfig)
-//                .reference(referenceConfig)
-//                .start();
-
-
+        try {
+            System.in.read();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 

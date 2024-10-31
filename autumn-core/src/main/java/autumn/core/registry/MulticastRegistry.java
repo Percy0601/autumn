@@ -5,7 +5,9 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.Arrays;
+import java.util.Objects;
 
+import autumn.core.AutumnBootstrap;
 import autumn.core.config.ApplicationConfig;
 import autumn.core.config.ProviderConfig;
 import autumn.core.util.ConverterUtil;
@@ -17,6 +19,22 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class MulticastRegistry implements Registry{
+    private static volatile MulticastRegistry instance;
+    public MulticastRegistry() {
+
+    }
+    public static MulticastRegistry getInstance() {
+        if(Objects.isNull(instance)) {
+            synchronized (AutumnBootstrap.class) {
+                if(Objects.isNull(instance)) {
+                    instance = new MulticastRegistry();
+                }
+            }
+        }
+        return instance;
+    }
+
+
     @Override
     public Boolean register() {
         return init();

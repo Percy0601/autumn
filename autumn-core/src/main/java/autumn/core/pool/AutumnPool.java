@@ -34,7 +34,6 @@ public final class AutumnPool {
                 }
             }
         }
-        singleton.init();
         return singleton;
     }
 

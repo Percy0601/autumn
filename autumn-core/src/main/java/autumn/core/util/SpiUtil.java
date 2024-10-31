@@ -11,24 +11,33 @@ import autumn.core.registry.client.Discovery;
  * @date: 2024/10/28
  */
 public class SpiUtil {
+    private static Discovery discovery;
+    private static Registry registry;
 
     public static Discovery discovery(){
-        ServiceLoader<Discovery> load = ServiceLoader.load(Discovery.class);
-        Iterator<Discovery> iterator = load.iterator();
-        if(!iterator.hasNext()) {
-            return null;
+        if(null == discovery) {
+            ServiceLoader<Discovery> load = ServiceLoader.load(Discovery.class);
+            Iterator<Discovery> iterator = load.iterator();
+            if(!iterator.hasNext()) {
+                return null;
+            }
+            discovery = iterator.next();
+            return discovery;
         }
-        Discovery discovery = iterator.next();
+
         return discovery;
     }
 
     public static Registry registry(){
-        ServiceLoader<Registry> load = ServiceLoader.load(Registry.class);
-        Iterator<Registry> iterator = load.iterator();
-        if(!iterator.hasNext()) {
-            return null;
+        if(null == registry) {
+            ServiceLoader<Registry> load = ServiceLoader.load(Registry.class);
+            Iterator<Registry> iterator = load.iterator();
+            if(!iterator.hasNext()) {
+                return null;
+            }
+            registry = iterator.next();
         }
-        Registry registry = iterator.next();
+
         return registry;
     }
 }

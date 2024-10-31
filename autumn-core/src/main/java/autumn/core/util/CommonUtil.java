@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.net.ssl.SSLContext;
 
@@ -50,6 +51,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CommonUtil {
     public static CloseableHttpClient httpClient = null;
+    private static Map<String, Properties> mapping = null;
 
     private CommonUtil() {
 
@@ -70,6 +72,8 @@ public class CommonUtil {
             httpClient = HttpClients.createDefault();
             log.warn("http client config exception: {}", e);
         }
+
+        mapping = new ConcurrentHashMap<>();
     }
 
     private static HttpClientConnectionManager getHttpClientConnectionManager() throws NoSuchAlgorithmException,
@@ -186,6 +190,11 @@ public class CommonUtil {
      * @return
      */
     public static Properties readClasspath(String filename) {
+        if(mapping.containsKey(filename)) {
+            Properties properties = mapping.get(filename);
+            return properties;
+        }
+
         Path path = null;
         URI uri = null;
         URL url = CommonUtil.class.getClassLoader()
@@ -213,6 +222,9 @@ public class CommonUtil {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        mapping.put(filename, properties);
+
         return properties;
     }
 }
