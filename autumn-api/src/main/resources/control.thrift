@@ -1,4 +1,4 @@
-namespace java autumn.api
+namespace java com.microapp.autumn.api
 
 service ControlApi {
     string health();
