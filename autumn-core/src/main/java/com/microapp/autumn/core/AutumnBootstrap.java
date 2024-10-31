@@ -5,13 +5,13 @@ import java.util.Objects;
 
 import org.apache.thrift.TServiceClient;
 
-import com.microapp.autumn.core.config.ApplicationConfig;
-import com.microapp.autumn.core.config.ConsumerConfig;
-import com.microapp.autumn.core.config.ReferenceConfig;
-import com.microapp.autumn.core.registry.client.Discovery;
+import com.microapp.autumn.api.Discovery;
+import com.microapp.autumn.api.config.ApplicationConfig;
+import com.microapp.autumn.api.config.ConsumerConfig;
+import com.microapp.autumn.api.config.ReferenceConfig;
+import com.microapp.autumn.api.util.SpiUtil;
+import com.microapp.autumn.api.util.ThreadUtil;
 import com.microapp.autumn.core.server.AutumnProvider;
-import com.microapp.autumn.core.util.SpiUtil;
-import com.microapp.autumn.core.util.ThreadUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;

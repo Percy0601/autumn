@@ -16,9 +16,10 @@ import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.layered.TFramedTransport;
 
-import com.microapp.autumn.core.config.ConsumerConfig;
-import com.microapp.autumn.core.config.ReferenceConfig;
-import com.microapp.autumn.core.util.AutumnException;
+import com.microapp.autumn.api.config.ConsumerConfig;
+import com.microapp.autumn.api.config.ReferenceConfig;
+import com.microapp.autumn.api.util.AutumnException;
+
 import lombok.extern.slf4j.Slf4j;
 
 import static java.util.concurrent.TimeUnit.MICROSECONDS;

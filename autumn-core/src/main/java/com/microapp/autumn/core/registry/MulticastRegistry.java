@@ -7,10 +7,11 @@ import java.net.MulticastSocket;
 import java.util.Arrays;
 import java.util.Objects;
 
-import com.microapp.autumn.core.AutumnBootstrap;
-import com.microapp.autumn.core.config.ApplicationConfig;
-import com.microapp.autumn.core.config.ProviderConfig;
-import com.microapp.autumn.core.util.ConverterUtil;
+import com.microapp.autumn.api.Registry;
+import com.microapp.autumn.api.config.ApplicationConfig;
+import com.microapp.autumn.api.config.ProviderConfig;
+import com.microapp.autumn.api.util.ConverterUtil;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -18,14 +19,14 @@ import lombok.extern.slf4j.Slf4j;
  * @date: 2024/10/28
  */
 @Slf4j
-public class MulticastRegistry implements Registry{
+public class MulticastRegistry implements Registry {
     private static volatile MulticastRegistry instance;
-    public MulticastRegistry() {
+    private MulticastRegistry() {
 
     }
     public static MulticastRegistry getInstance() {
         if(Objects.isNull(instance)) {
-            synchronized (AutumnBootstrap.class) {
+            synchronized (MulticastRegistry.class) {
                 if(Objects.isNull(instance)) {
                     instance = new MulticastRegistry();
                 }

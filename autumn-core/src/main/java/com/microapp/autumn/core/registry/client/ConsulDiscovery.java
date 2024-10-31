@@ -5,15 +5,16 @@ import java.util.Objects;
 
 import org.apache.thrift.TServiceClient;
 
-import com.microapp.autumn.core.config.ConsumerConfig;
-import com.microapp.autumn.core.config.ReferenceConfig;
+import com.microapp.autumn.api.Discovery;
+import com.microapp.autumn.api.config.ConsumerConfig;
+import com.microapp.autumn.api.config.ReferenceConfig;
 import com.microapp.autumn.core.pool.AutumnPool;
 
 /**
  * @author: baoxin.zhao
  * @date: 2024/10/28
  */
-public class ConsulDiscovery implements Discovery{
+public class ConsulDiscovery implements Discovery {
     @Override
     public <T extends TServiceClient> void reference(Class<T> classType, ReferenceConfig referenceConfig) {
 

@@ -4,9 +4,9 @@ import org.apache.thrift.TException;
 import org.apache.thrift.TServiceClient;
 
 import com.microapp.autumn.api.ControlApi;
-import com.microapp.autumn.core.config.ApplicationConfig;
-import com.microapp.autumn.core.config.ProviderConfig;
-import com.microapp.autumn.core.config.ReferenceConfig;
+import com.microapp.autumn.api.config.ApplicationConfig;
+import com.microapp.autumn.api.config.ProviderConfig;
+import com.microapp.autumn.api.config.ReferenceConfig;
 import com.microapp.autumn.core.pool.AutumnPool;
 
 /**

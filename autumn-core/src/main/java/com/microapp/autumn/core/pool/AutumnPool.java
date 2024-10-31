@@ -5,8 +5,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.thrift.TServiceClient;
 
-import com.microapp.autumn.core.config.ConsumerConfig;
-import com.microapp.autumn.core.config.ReferenceConfig;
+import com.microapp.autumn.api.config.ConsumerConfig;
+import com.microapp.autumn.api.config.ReferenceConfig;
 import com.microapp.autumn.core.pool.impl.ConcurrentBag;
 import com.microapp.autumn.core.pool.impl.ConcurrentBagEntry;
 import lombok.extern.slf4j.Slf4j;
