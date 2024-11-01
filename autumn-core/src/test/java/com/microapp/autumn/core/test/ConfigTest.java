@@ -12,7 +12,8 @@ import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
 
-import com.microapp.autumn.core.util.CommonUtil;
+import com.microapp.autumn.api.util.CommonUtil;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

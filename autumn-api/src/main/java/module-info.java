@@ -18,4 +18,6 @@ module autumn.api {
     exports com.microapp.autumn.api.enums;
     exports com.microapp.autumn.api.annotation;
     exports com.microapp.autumn.api;
+    uses com.microapp.autumn.api.Discovery;
+    uses com.microapp.autumn.api.Registry;
 }

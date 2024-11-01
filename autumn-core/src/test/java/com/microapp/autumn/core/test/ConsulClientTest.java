@@ -6,8 +6,9 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import com.microapp.autumn.core.util.CommonUtil;
-import com.microapp.autumn.core.util.ConsulClient;
+import com.microapp.autumn.api.util.CommonUtil;
+import com.microapp.autumn.api.util.ConsulClient;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**

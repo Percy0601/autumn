@@ -13,11 +13,12 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import com.microapp.autumn.core.config.ApplicationConfig;
-import com.microapp.autumn.core.config.ProviderConfig;
-import com.microapp.autumn.core.registry.client.Discovery;
-import com.microapp.autumn.core.util.CommonUtil;
-import com.microapp.autumn.core.util.SpiUtil;
+import com.microapp.autumn.api.Discovery;
+import com.microapp.autumn.api.config.ApplicationConfig;
+import com.microapp.autumn.api.config.ProviderConfig;
+import com.microapp.autumn.api.util.CommonUtil;
+import com.microapp.autumn.api.util.SpiUtil;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**

@@ -29,7 +29,7 @@ public class AutumnBootstrap {
     private ApplicationConfig applicationConfig;
     private AutumnBootstrap() {}
 
-    public static AutumnBootstrap getInstance() {
+    public static AutumnBootstrap getService() {
         if(Objects.isNull(instance)) {
             synchronized (AutumnBootstrap.class) {
                 if(Objects.isNull(instance)) {

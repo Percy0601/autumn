@@ -24,7 +24,7 @@ public class MulticastRegistry implements Registry {
     private MulticastRegistry() {
 
     }
-    public static MulticastRegistry getInstance() {
+    public static MulticastRegistry provider() {
         if(Objects.isNull(instance)) {
             synchronized (MulticastRegistry.class) {
                 if(Objects.isNull(instance)) {
