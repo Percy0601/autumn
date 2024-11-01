@@ -33,12 +33,26 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 public class MulticastDiscovery implements Discovery {
+    private static volatile MulticastDiscovery instance;
 
     private ConcurrentHashMap<Class<? extends TServiceClient>, ReferenceConfig> refers = new ConcurrentHashMap<>();
     private AtomicBoolean initStatus = new AtomicBoolean(false);
     private MulticastSocket mc;
-    public MulticastDiscovery() {
-        init();
+
+    private MulticastDiscovery() {
+
+    }
+
+    public static MulticastDiscovery provider() {
+        if(Objects.isNull(instance)) {
+            synchronized (ConsulDiscovery.class) {
+                if(Objects.isNull(instance)) {
+                    instance = new MulticastDiscovery();
+                    instance.init();
+                }
+            }
+        }
+        return instance;
     }
 
     private void init() {

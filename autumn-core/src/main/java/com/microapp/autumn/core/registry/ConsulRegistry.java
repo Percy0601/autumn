@@ -14,7 +14,7 @@ public class ConsulRegistry implements Registry {
 
     }
 
-    public static ConsulRegistry getInstance() {
+    public static ConsulRegistry provider() {
         if(Objects.isNull(instance)) {
             synchronized (ConsulRegistry.class) {
                 if(Objects.isNull(instance)) {

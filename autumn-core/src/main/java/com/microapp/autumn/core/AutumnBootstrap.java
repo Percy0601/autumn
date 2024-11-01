@@ -25,11 +25,10 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 public class AutumnBootstrap {
     private static volatile AutumnBootstrap instance;
-
     private ApplicationConfig applicationConfig;
     private AutumnBootstrap() {}
 
-    public static AutumnBootstrap getService() {
+    public static AutumnBootstrap getInstance() {
         if(Objects.isNull(instance)) {
             synchronized (AutumnBootstrap.class) {
                 if(Objects.isNull(instance)) {
@@ -41,7 +40,7 @@ public class AutumnBootstrap {
     }
 
     public void serve() {
-        AutumnProvider provider = AutumnProvider.getInstance();
+        AutumnProvider provider = AutumnProvider.provider();
         provider.start();
         log.info("autumn provider finish");
 

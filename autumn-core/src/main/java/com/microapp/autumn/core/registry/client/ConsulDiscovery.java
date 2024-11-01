@@ -9,12 +9,26 @@ import com.microapp.autumn.api.Discovery;
 import com.microapp.autumn.api.config.ConsumerConfig;
 import com.microapp.autumn.api.config.ReferenceConfig;
 import com.microapp.autumn.core.pool.AutumnPool;
+import com.microapp.autumn.core.registry.MulticastRegistry;
 
 /**
  * @author: baoxin.zhao
  * @date: 2024/10/28
  */
 public class ConsulDiscovery implements Discovery {
+    private static volatile ConsulDiscovery instance;
+
+    public static ConsulDiscovery provider() {
+        if(Objects.isNull(instance)) {
+            synchronized (ConsulDiscovery.class) {
+                if(Objects.isNull(instance)) {
+                    instance = new ConsulDiscovery();
+                }
+            }
+        }
+        return instance;
+    }
+
     @Override
     public <T extends TServiceClient> void reference(Class<T> classType, ReferenceConfig referenceConfig) {
 

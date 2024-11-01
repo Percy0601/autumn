@@ -41,7 +41,8 @@ public class AutumnProvider {
     private AutumnProvider() {
 
     }
-    public static AutumnProvider getInstance() {
+
+    public static AutumnProvider provider() {
         if (singleton == null) {
             synchronized (AutumnPool.class) {
                 if (singleton == null) {

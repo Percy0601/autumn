@@ -29,7 +29,7 @@ public class TrainingTest {
         TProcessor tprocessor = new SomeService.Processor<SomeService.Iface>(new SomeServiceImpl());
         AttachableProcessor attachableProcessor = new AttachableProcessor(tprocessor);
         fooServiceConfig.setRef(attachableProcessor);
-        AutumnBootstrap.getService().serve();
+        AutumnBootstrap.getInstance().serve();
 
         try {
             System.in.read();
