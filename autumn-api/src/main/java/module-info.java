@@ -9,8 +9,6 @@ module autumn.api {
     requires lombok;
     requires transitive org.slf4j;
     requires transitive org.apache.thrift;
-    requires transitive org.apache.httpcomponents.core5.httpcore5;
-    requires transitive org.apache.httpcomponents.client5.httpclient5;
 
     exports com.microapp.autumn.api.config;
     exports com.microapp.autumn.api.util;
