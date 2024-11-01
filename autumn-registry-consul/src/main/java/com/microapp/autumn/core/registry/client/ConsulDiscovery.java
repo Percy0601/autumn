@@ -9,7 +9,6 @@ import com.microapp.autumn.api.Discovery;
 import com.microapp.autumn.api.config.ConsumerConfig;
 import com.microapp.autumn.api.config.ReferenceConfig;
 import com.microapp.autumn.core.pool.AutumnPool;
-import com.microapp.autumn.core.registry.MulticastRegistry;
 
 /**
  * @author: baoxin.zhao

@@ -1,4 +1,4 @@
-package com.microapp.autumn.api.util;
+package com.microapp.autumn.core.registry.util;
 
 import java.io.IOException;
 import java.net.URI;
@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.net.ssl.SSLContext;
 
