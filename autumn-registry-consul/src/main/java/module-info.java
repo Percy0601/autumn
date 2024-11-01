@@ -4,7 +4,9 @@
  */
 module autumn.registry.consul {
     requires lombok;
-    requires transitive autumn.api;
+    requires autumn.api;
+    requires autumn.core;
+
     exports com.microapp.autumn.core.registry;
 
     provides com.microapp.autumn.api.Registry with

@@ -24,6 +24,10 @@
             <groupId>com.micro-app</groupId>
             <artifactId>autumn-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.micro-app</groupId>
+            <artifactId>autumn-core</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
