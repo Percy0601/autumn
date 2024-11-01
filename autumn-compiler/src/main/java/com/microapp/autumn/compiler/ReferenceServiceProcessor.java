@@ -5,7 +5,6 @@ import com.microapp.autumn.compiler.model.MethodElement;
 import com.microapp.autumn.compiler.model.ReferenceEntry;
 import com.microapp.autumn.compiler.util.ClassNameUtil;
 import com.microapp.autumn.compiler.util.MetaHolder;
-import com.alibaba.fastjson.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,7 +103,7 @@ public class ReferenceServiceProcessor extends AbstractProcessor {
         ReferenceEntry entry = new ReferenceEntry();
         entry.setInterfaceName(interfaceClass.toString());
         entry.setMethodElements(methodElements);
-        log.info("entry:{}", JSON.toJSONString(entry));
+//        log.info("entry:{}", JSON.toJSONString(entry));
         MetaHolder.addReferService(interfaceClass.toString(), entry);
     }
 

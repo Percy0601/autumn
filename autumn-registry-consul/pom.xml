@@ -7,7 +7,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>autumn-core</artifactId>
+    <artifactId>autumn-registry-consul</artifactId>
     <packaging>jar</packaging>
 
     <name>autumn-core</name>

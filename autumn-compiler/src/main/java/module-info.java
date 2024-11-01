@@ -9,7 +9,5 @@ module autumn.compiler {
     requires org.apache.commons.lang3;
     requires freemarker;
     requires transitive java.compiler;
-    requires com.alibaba.fastjson2;
-    requires fastjson;
     requires transitive autumn.core;
 }
