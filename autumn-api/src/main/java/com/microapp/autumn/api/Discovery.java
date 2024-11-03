@@ -19,4 +19,6 @@ public interface Discovery {
     List<String> services();
 
     List<ConsumerConfig> getInstances(String name);
+
+
 }

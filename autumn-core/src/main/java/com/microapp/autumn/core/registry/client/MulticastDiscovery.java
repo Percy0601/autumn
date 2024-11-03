@@ -21,6 +21,8 @@ import com.microapp.autumn.api.config.ProviderConfig;
 import com.microapp.autumn.api.config.ReferenceConfig;
 import com.microapp.autumn.api.enums.MulticastEventEnum;
 import com.microapp.autumn.api.util.ConverterUtil;
+import com.microapp.autumn.api.util.SpiUtil;
+import com.microapp.autumn.api.util.ThreadUtil;
 import com.microapp.autumn.core.pool.AutumnPool;
 
 import lombok.Getter;
@@ -45,7 +47,7 @@ public class MulticastDiscovery implements Discovery {
 
     public static MulticastDiscovery provider() {
         if(Objects.isNull(instance)) {
-            synchronized (ConsulDiscovery.class) {
+            synchronized (MulticastDiscovery.class) {
                 if(Objects.isNull(instance)) {
                     instance = new MulticastDiscovery();
                     instance.init();
@@ -186,5 +188,23 @@ public class MulticastDiscovery implements Discovery {
             return null;
         }
         return config.getInstances();
+    }
+
+    private void checkHealth() {
+        Runnable runnable = () -> {
+            Discovery discovery = SpiUtil.discovery();
+            List<String> services = discovery.services();
+            if(Objects.isNull(services) || services.size() < 1) {
+                return;
+            }
+            services.forEach(it -> {
+                List<ConsumerConfig> instances = discovery.getInstances(it);
+
+
+
+            });
+
+        };
+        ThreadUtil.getInstance().scheduleWithFixedDelay(runnable, 300L);
     }
 }
