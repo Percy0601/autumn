@@ -44,7 +44,7 @@ public class AutumnProvider {
 
     public static AutumnProvider provider() {
         if (singleton == null) {
-            synchronized (AutumnPool.class) {
+            synchronized (AutumnProvider.class) {
                 if (singleton == null) {
                     singleton = new AutumnProvider();
                     singleton.init();

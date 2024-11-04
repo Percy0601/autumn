@@ -56,10 +56,6 @@ public class AutumnBootstrap {
         Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook));
     }
 
-    public <T extends TServiceClient> AutumnBootstrap reference(ReferenceConfig<T> referenceConfig) {
-        Discovery discovery = SpiUtil.discovery();
-        discovery.reference(referenceConfig.getInterfaceClass(), referenceConfig);
-        return this;
-    }
+
 
 }

@@ -13,6 +13,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 import org.apache.thrift.TServiceClient;
+import org.apache.thrift.transport.TSocket;
+import org.apache.thrift.transport.TTransport;
+import org.apache.thrift.transport.TTransportException;
+import org.apache.thrift.transport.layered.TFramedTransport;
 
 import com.microapp.autumn.api.Discovery;
 import com.microapp.autumn.api.config.ApplicationConfig;
@@ -199,12 +203,27 @@ public class MulticastDiscovery implements Discovery {
             }
             services.forEach(it -> {
                 List<ConsumerConfig> instances = discovery.getInstances(it);
+                if(instances.size() < 1) {
+                    return;
+                }
+                instances.forEach(instance -> {
+                    String ip = instance.getIp();
+                    Integer port = instance.getPort();
 
+                    TTransport transport = null;
+                    TTransport tsocket = null;
+                    try {
+                        tsocket = new TSocket(ip, port);
+                        transport = new TFramedTransport(tsocket);
+                    } catch (TTransportException e) {
 
-
+                    }
+                });
             });
 
         };
         ThreadUtil.getInstance().scheduleWithFixedDelay(runnable, 300L);
     }
+
+
 }
