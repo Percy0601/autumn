@@ -47,4 +47,9 @@ public class ConsulDiscovery implements Discovery {
         return config.getInstances();
     }
 
+    @Override
+    public Boolean checkHealth(String ip, Integer port) {
+        return null;
+    }
+
 }

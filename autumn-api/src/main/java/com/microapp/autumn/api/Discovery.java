@@ -20,5 +20,6 @@ public interface Discovery {
 
     List<ConsumerConfig> getInstances(String name);
 
+    Boolean checkHealth(String ip, Integer port);
 
 }

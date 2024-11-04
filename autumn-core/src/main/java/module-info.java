@@ -5,9 +5,12 @@
 module autumn.core {
     requires lombok;
     requires transitive autumn.api;
+
     exports com.microapp.autumn.core.server;
     exports com.microapp.autumn.core;
     exports com.microapp.autumn.core.pool;
+    exports com.microapp.autumn.core.registry.client;
+    exports com.microapp.autumn.core.registry;
 
     provides com.microapp.autumn.api.Registry with
             com.microapp.autumn.core.registry.MulticastRegistry;

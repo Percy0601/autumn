@@ -6,6 +6,8 @@ import java.lang.management.RuntimeMXBean;
 import java.util.Objects;
 import java.util.Properties;
 
+import com.microapp.autumn.api.util.CommonUtil;
+
 import lombok.Getter;
 import lombok.ToString;
 
@@ -32,6 +34,8 @@ public class ApplicationConfig {
             synchronized (ApplicationConfig.class) {
                 if(Objects.isNull(instance)) {
                     instance = new ApplicationConfig();
+                    Properties properties = CommonUtil.readClasspath("application.properties");
+                    instance.init(properties);
                 }
             }
         }

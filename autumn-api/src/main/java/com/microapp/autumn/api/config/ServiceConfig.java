@@ -1,5 +1,7 @@
 package com.microapp.autumn.api.config;
 
+import org.apache.thrift.TProcessor;
+
 import com.microapp.autumn.api.extension.AttachableProcessor;
 
 import lombok.Data;
@@ -11,5 +13,5 @@ import lombok.Data;
 @Data
 public class ServiceConfig<T> {
     private Class<?> interfaceClass;
-    private transient AttachableProcessor ref;
+    private transient TProcessor ref;
 }

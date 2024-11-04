@@ -17,15 +17,12 @@ import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.layered.TFramedTransport;
 
 import com.microapp.autumn.api.ControlApi;
-
-import com.microapp.autumn.api.config.ApplicationConfig;
 import com.microapp.autumn.api.config.ProviderConfig;
 import com.microapp.autumn.api.config.ServiceConfig;
-import com.microapp.autumn.api.extension.AttachableProcessor;
 import com.microapp.autumn.api.util.CommonUtil;
 import com.microapp.autumn.api.util.ThreadUtil;
 import com.microapp.autumn.core.devops.ControlApiImpl;
-import com.microapp.autumn.core.pool.AutumnPool;
+
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -55,9 +52,9 @@ public class AutumnProvider {
         return singleton;
     }
 
-    private void export(String name, AttachableProcessor serviceProcessor) {
+    private void export(String name, TProcessor serviceProcessor) {
 
-        if(!services.containsKey(name)) {
+        if(services.containsKey(name)) {
             return;
         }
         processor.registerProcessor(name, serviceProcessor);
@@ -73,17 +70,14 @@ public class AutumnProvider {
         Properties properties = CommonUtil.readClasspath("application.properties");
         ProviderConfig providerConfig = ProviderConfig.getInstance();
         providerConfig.init(properties);
-        ApplicationConfig applicationConfig = ApplicationConfig.getInstance();
-        applicationConfig.init(properties);
-
         services = new ConcurrentHashMap<>();
         processor = new TMultiplexedProcessor();
-        ServiceConfig<ControlApi.Iface> controlApiService = new ServiceConfig();
-        controlApiService.setInterfaceClass(ControlApi.Iface.class);
-        TProcessor controlProcessor = new ControlApi.Processor<ControlApi.Iface>(new ControlApiImpl());
-        AttachableProcessor attachableProcessor = new AttachableProcessor(controlProcessor);
-        controlApiService.setRef(attachableProcessor);
-        service(controlApiService);
+//        ServiceConfig<ControlApi.Iface> controlApiService = new ServiceConfig();
+//        controlApiService.setInterfaceClass(ControlApi.Iface.class);
+//        TProcessor controlProcessor = new ControlApi.Processor<ControlApi.Iface>(new ControlApiImpl());
+//        AttachableProcessor attachableProcessor = new AttachableProcessor(controlProcessor);
+//        controlApiService.setRef(attachableProcessor);
+//        service(controlApiService);
 
     }
 
@@ -110,8 +104,8 @@ public class AutumnProvider {
                 ServiceConfig<ControlApi.Iface> controlApiService = new ServiceConfig();
                 controlApiService.setInterfaceClass(ControlApi.Iface.class);
                 TProcessor controlProcessor = new ControlApi.Processor<ControlApi.Iface>(new ControlApiImpl());
-                AttachableProcessor attachableProcessor = new AttachableProcessor(controlProcessor);
-                controlApiService.setRef(attachableProcessor);
+                //AttachableProcessor attachableProcessor = new AttachableProcessor(controlProcessor);
+                controlApiService.setRef(controlProcessor);
                 service(controlApiService);
                 TServer server = new TThreadedSelectorServer(tArgs);
                 server.serve();

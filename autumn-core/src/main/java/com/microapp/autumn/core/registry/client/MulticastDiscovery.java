@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 
 import org.apache.thrift.TException;
 import org.apache.thrift.TServiceClient;
+import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TMultiplexedProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
@@ -29,7 +30,6 @@ import com.microapp.autumn.api.config.ProviderConfig;
 import com.microapp.autumn.api.config.ReferenceConfig;
 import com.microapp.autumn.api.enums.MulticastEventEnum;
 import com.microapp.autumn.api.extension.AttachableBinaryProtocol;
-import com.microapp.autumn.api.extension.AttachableProcessor;
 import com.microapp.autumn.api.util.ConverterUtil;
 import com.microapp.autumn.api.util.SpiUtil;
 import com.microapp.autumn.api.util.ThreadUtil;
@@ -200,7 +200,7 @@ public class MulticastDiscovery implements Discovery {
         return config.getInstances();
     }
 
-    private void checkHealth() {
+    private void handleCheckHealth() {
         Runnable runnable = () -> {
             Discovery discovery = SpiUtil.discovery();
             List<String> services = discovery.services();
@@ -213,7 +213,7 @@ public class MulticastDiscovery implements Discovery {
                     return;
                 }
                 instances.forEach(instance -> {
-                    Boolean result = handleCheckHealth(instance.getIp(), instance.getPort());
+                    Boolean result = checkHealth(instance.getIp(), instance.getPort());
                     if(!result) {
                         Integer count = instance.getCheckFail();
                         if(Objects.isNull(count)) {
@@ -229,13 +229,14 @@ public class MulticastDiscovery implements Discovery {
         ThreadUtil.getInstance().scheduleWithFixedDelay(runnable, 300L);
     }
 
-    private Boolean handleCheckHealth(String ip, Integer port) {
+    public Boolean checkHealth(String ip, Integer port) {
         TTransport transport = null;
         TTransport tsocket = null;
         try {
             tsocket = new TSocket(ip, port);
             transport = new TFramedTransport(tsocket);
-            TProtocol protocol = new AttachableBinaryProtocol(transport);
+            TProtocol protocol = new TBinaryProtocol(transport);
+            transport.open();
             TMultiplexedProtocol multiplexedProtocol = new TMultiplexedProtocol(protocol, ControlApi.Iface.class.getName());
             ControlApi.Iface client = new ControlApi.Client(multiplexedProtocol);
             String result = client.health();
@@ -246,6 +247,9 @@ public class MulticastDiscovery implements Discovery {
         } catch (TException e) {
             log.warn("autumn check health exception: ", e);
             return false;
+        } finally {
+          transport.close();
+          tsocket.close();
         }
     }
 
