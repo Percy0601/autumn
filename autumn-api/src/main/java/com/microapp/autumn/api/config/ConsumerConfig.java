@@ -36,10 +36,6 @@ public class ConsumerConfig {
      */
     private Integer connections;
     /**
-     * check health latest active date
-     */
-    private Date latestActive;
-    /**
      * check health fail count
      */
     private Integer checkFail;

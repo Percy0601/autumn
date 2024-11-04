@@ -12,18 +12,24 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+import org.apache.thrift.TException;
 import org.apache.thrift.TServiceClient;
+import org.apache.thrift.protocol.TMultiplexedProtocol;
+import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.layered.TFramedTransport;
 
+import com.microapp.autumn.api.ControlApi;
 import com.microapp.autumn.api.Discovery;
 import com.microapp.autumn.api.config.ApplicationConfig;
 import com.microapp.autumn.api.config.ConsumerConfig;
 import com.microapp.autumn.api.config.ProviderConfig;
 import com.microapp.autumn.api.config.ReferenceConfig;
 import com.microapp.autumn.api.enums.MulticastEventEnum;
+import com.microapp.autumn.api.extension.AttachableBinaryProtocol;
+import com.microapp.autumn.api.extension.AttachableProcessor;
 import com.microapp.autumn.api.util.ConverterUtil;
 import com.microapp.autumn.api.util.SpiUtil;
 import com.microapp.autumn.api.util.ThreadUtil;
@@ -207,22 +213,40 @@ public class MulticastDiscovery implements Discovery {
                     return;
                 }
                 instances.forEach(instance -> {
-                    String ip = instance.getIp();
-                    Integer port = instance.getPort();
-
-                    TTransport transport = null;
-                    TTransport tsocket = null;
-                    try {
-                        tsocket = new TSocket(ip, port);
-                        transport = new TFramedTransport(tsocket);
-                    } catch (TTransportException e) {
-
+                    Boolean result = handleCheckHealth(instance.getIp(), instance.getPort());
+                    if(!result) {
+                        Integer count = instance.getCheckFail();
+                        if(Objects.isNull(count)) {
+                            instance.setCheckFail(1);
+                            return;
+                        }
+                        instance.setCheckFail(++count);
                     }
+                    instance.setCheckFail(0);
                 });
             });
-
         };
         ThreadUtil.getInstance().scheduleWithFixedDelay(runnable, 300L);
+    }
+
+    private Boolean handleCheckHealth(String ip, Integer port) {
+        TTransport transport = null;
+        TTransport tsocket = null;
+        try {
+            tsocket = new TSocket(ip, port);
+            transport = new TFramedTransport(tsocket);
+            TProtocol protocol = new AttachableBinaryProtocol(transport);
+            TMultiplexedProtocol multiplexedProtocol = new TMultiplexedProtocol(protocol, ControlApi.Iface.class.getName());
+            ControlApi.Iface client = new ControlApi.Client(multiplexedProtocol);
+            String result = client.health();
+            return "OK".equals(result);
+        } catch (TTransportException e) {
+            log.warn("autumn check health connect exception: ", e);
+            return false;
+        } catch (TException e) {
+            log.warn("autumn check health exception: ", e);
+            return false;
+        }
     }
 
 
