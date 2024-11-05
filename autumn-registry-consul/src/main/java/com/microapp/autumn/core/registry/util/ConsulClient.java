@@ -44,7 +44,6 @@ import lombok.extern.slf4j.Slf4j;
 public class ConsulClient {
     public static CloseableHttpClient httpClient = null;
 
-
     private static volatile ConsulClient instance;
     private ConsulClient() {
 

@@ -9,11 +9,4 @@ module autumn.registry.consul {
     requires org.apache.httpcomponents.core5.httpcore5;
     requires org.apache.httpcomponents.client5.httpclient5;
 
-    exports com.microapp.autumn.core.registry;
-
-    provides com.microapp.autumn.api.Registry with
-            com.microapp.autumn.core.registry.ConsulRegistry;
-    provides com.microapp.autumn.api.Discovery with
-            com.microapp.autumn.core.registry.client.ConsulDiscovery;
-
 }
