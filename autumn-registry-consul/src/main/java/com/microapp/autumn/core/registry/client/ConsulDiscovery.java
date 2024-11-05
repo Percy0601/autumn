@@ -10,10 +10,13 @@ import com.microapp.autumn.api.config.ConsumerConfig;
 import com.microapp.autumn.api.config.ReferenceConfig;
 import com.microapp.autumn.core.pool.AutumnPool;
 
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * @author: baoxin.zhao
  * @date: 2024/10/28
  */
+@Slf4j
 public class ConsulDiscovery implements Discovery {
     private static volatile ConsulDiscovery instance;
 
@@ -26,6 +29,11 @@ public class ConsulDiscovery implements Discovery {
             }
         }
         return instance;
+    }
+
+    @Override
+    public void discovery() {
+        log.info("begin discovery reference instances.");
     }
 
     @Override

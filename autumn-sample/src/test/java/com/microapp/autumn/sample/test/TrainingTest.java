@@ -52,11 +52,12 @@ public class TrainingTest {
 
     @Test
     void testConsumer() {
-        String ip = "192.168.1.12";
+        String ip = "192.168.1.9";
         Integer port = 30880;
 
         SpiUtil.discovery();
         Boolean result = MulticastDiscovery.provider().checkHealth(ip, port);
+
         log.info("===========check health result: {}", result);
     }
 

@@ -14,6 +14,8 @@ import com.microapp.autumn.api.config.ReferenceConfig;
  */
 public interface Discovery {
 
+    void discovery();
+
     <T extends TServiceClient> void reference(Class<T> classType, ReferenceConfig referenceConfig);
 
     List<String> services();

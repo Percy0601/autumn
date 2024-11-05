@@ -60,14 +60,13 @@ public class MulticastDiscovery implements Discovery {
             synchronized (MulticastDiscovery.class) {
                 if(Objects.isNull(instance)) {
                     instance = new MulticastDiscovery();
-                    instance.init();
                 }
             }
         }
         return instance;
     }
 
-    private void init() {
+    public void discovery() {
         if(Boolean.TRUE.equals(initStatus.get())) {
             return;
         }

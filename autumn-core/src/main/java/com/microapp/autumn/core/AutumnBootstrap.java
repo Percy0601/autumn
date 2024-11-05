@@ -45,6 +45,7 @@ public class AutumnBootstrap {
         SpiUtil.registry().register();
         log.info("autumn registry finish");
 
+        SpiUtil.discovery();
         shutdownHook();
     }
 
