@@ -10,7 +10,7 @@
     <artifactId>autumn-registry-consul</artifactId>
     <packaging>jar</packaging>
 
-    <name>autumn-core</name>
+    <name>autumn-registry-consul</name>
     <url>http://maven.apache.org</url>
 
     <properties>
@@ -30,7 +30,7 @@
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
     </dependencies>
 
