@@ -23,7 +23,6 @@
         <dependency>
             <groupId>com.micro-app</groupId>
             <artifactId>autumn-core</artifactId>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>

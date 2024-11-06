@@ -7,10 +7,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>autumn-sample</artifactId>
+    <artifactId>autumn-sample-boot-consumer</artifactId>
     <packaging>jar</packaging>
 
-    <name>autumn-sample</name>
+    <name>autumn-sample-boot-consumer</name>
     <url>http://maven.apache.org</url>
 
     <properties>
