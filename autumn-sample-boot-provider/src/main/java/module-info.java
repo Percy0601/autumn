@@ -1,12 +1,18 @@
 /**
+ * 
  * @author: baoxin.zhao
- * @date: 2024/10/31
+ * @date: 2024/11/6 
  */
-module autumn.sample {
+
+
+module autumn.sample.boot.provider {
     requires java.annotation;
     requires org.slf4j;
     requires lombok;
-    requires transitive autumn.core;
-    exports com.microapp.autumn.sample.api;
-    exports com.microapp.autumn.sample.service;
+    requires org.apache.thrift;
+    requires autumn.core;
+    requires autumn.sample.api;
+    requires spring.context;
+
+    exports com.microapp.autumn.sample.boot.provider.service;
 }
