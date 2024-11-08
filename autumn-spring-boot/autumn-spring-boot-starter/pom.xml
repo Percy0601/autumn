@@ -22,16 +22,7 @@
     <dependencies>
         <dependency>
             <groupId>com.micro-app</groupId>
-            <artifactId>autumn-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.micro-app</groupId>
-            <artifactId>autumn-compiler</artifactId>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure</artifactId>
+            <artifactId>autumn-spring-boot-autoconfigure</artifactId>
         </dependency>
 
     </dependencies>
