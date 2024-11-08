@@ -1,16 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>autumn</artifactId>
+        <artifactId>autumn-sample</artifactId>
         <groupId>com.micro-app</groupId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>autumn-sample-basic-provider</artifactId>
+    <artifactId>autumn-sample-boot-provider</artifactId>
     <packaging>jar</packaging>
 
-    <name>autumn-sample-basic-provider</name>
+    <name>autumn-sample-boot-provider</name>
     <url>http://maven.apache.org</url>
 
     <properties>
@@ -20,6 +20,10 @@
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot</artifactId>
+        </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>javax.annotation-api</artifactId>
