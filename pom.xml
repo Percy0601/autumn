@@ -6,7 +6,7 @@
         <module>autumn-compiler</module>
         <module>autumn-core</module>
         <module>autumn-registry-consul</module>
-        <module>autumn-spring-boot-starter</module>
+        <module>autumn-spring-boot</module>
         <module>autumn-sample</module>
     </modules>
 
