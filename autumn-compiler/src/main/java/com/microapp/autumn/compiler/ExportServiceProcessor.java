@@ -15,7 +15,7 @@ import javax.lang.model.type.TypeMirror;
 import java.util.List;
 import java.util.Set;
 
-@SupportedAnnotationTypes(value = {"autumn.core.annotation.Export"})
+@SupportedAnnotationTypes(value = {"com.microapp.autumn.core.annotation.Export"})
 @SupportedSourceVersion(value = SourceVersion.RELEASE_11)
 public class ExportServiceProcessor extends AbstractProcessor {
     private Logger log = LoggerFactory.getLogger(ExportServiceProcessor.class);
@@ -37,7 +37,7 @@ public class ExportServiceProcessor extends AbstractProcessor {
         }
         TypeElement te = (TypeElement) annotatedClass;
         List<? extends TypeMirror> interfaces = te.getInterfaces();
-        MetaHolder.addExportService(annotatedClass.toString(), interfaces);
+        //MetaHolder.addExportService(annotatedClass.toString(), interfaces);
     }
 
 

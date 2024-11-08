@@ -6,8 +6,9 @@
         <module>autumn-compiler</module>
         <module>autumn-core</module>
         <module>autumn-registry-consul</module>
-        <module>autumn-sample</module>
         <module>autumn-sample-api</module>
+        <module>autumn-sample-basic-consumer</module>
+        <module>autumn-sample-basic-provider</module>
         <module>autumn-sample-boot-provider</module>
         <module>autumn-sample-boot-consumer</module>
     </modules>

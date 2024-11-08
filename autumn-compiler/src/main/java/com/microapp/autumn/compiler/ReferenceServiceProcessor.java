@@ -26,21 +26,23 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@SupportedAnnotationTypes(value = {"autumn.core.annotation.Reference"})
+@SupportedAnnotationTypes(value = {"com.microapp.autumn.core.annotation.Reference"})
 @SupportedSourceVersion(value = SourceVersion.RELEASE_11)
 public class ReferenceServiceProcessor extends AbstractProcessor {
     private Logger log = LoggerFactory.getLogger(ReferenceServiceProcessor.class);
     private volatile AtomicBoolean executed = new AtomicBoolean(false);
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+        log.info("begin handle reference annotation.");
+
         for (TypeElement annotationElement: annotations) {
             Set<? extends Element> annotatedClasses = roundEnv.getElementsAnnotatedWith(annotationElement);
             for(Element annotatedClass: annotatedClasses) {
-                handleAnnotationClass(annotationElement, annotatedClass);
+                //handleAnnotationClass(annotationElement, annotatedClass);
             }
         }
         if(!executed.getAndSet(true)) {
-            handleWrite();
+            //handleWrite();
         }
 
         return true;
