@@ -1,13 +1,12 @@
 /**
+ * 
  * @author: baoxin.zhao
- * @date: 2024/10/31
+ * @date: 2024/11/8 
  */
-module autumn.registry.consul {
+module autumn.spring.boot.starter {
     requires lombok;
-    requires autumn.api;
-    requires autumn.core;
-    requires org.apache.httpcomponents.core5.httpcore5;
-    requires org.apache.httpcomponents.client5.httpclient5;
-    requires com.fasterxml.jackson.databind;
+    requires org.slf4j;
+    requires transitive java.compiler;
+    requires transitive autumn.core;
 
 }
