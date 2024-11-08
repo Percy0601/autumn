@@ -67,6 +67,11 @@ public final class AutumnPool {
         bag.requite(entry);
     }
 
+    public void remove(ConcurrentBagEntry entry) {
+        ConcurrentBag bag = mapping.get(entry.getService());
+        bag.remove(entry);
+    }
+
     public void join(ConsumerConfig consumerConfig) {
         ConcurrentBag bag = mapping.get(consumerConfig.getName());
         bag.join(consumerConfig);

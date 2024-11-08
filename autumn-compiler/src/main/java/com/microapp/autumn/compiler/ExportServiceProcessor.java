@@ -57,7 +57,7 @@ public class ExportServiceProcessor extends AbstractProcessor {
         }
         TypeElement te = (TypeElement) annotatedClass;
         List<? extends TypeMirror> interfaces = te.getInterfaces();
-        MetaHolder.addExportService(annotatedClass.toString(), interfaces);
+        //MetaHolder.addExportService(annotatedClass.toString(), interfaces);
     }
 
 

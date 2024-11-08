@@ -10,4 +10,6 @@ module autumn.compiler {
     requires freemarker;
     requires transitive java.compiler;
     requires transitive autumn.core;
+
+    exports com.microapp.autumn.compiler;
 }
