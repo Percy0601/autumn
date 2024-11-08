@@ -180,6 +180,22 @@ public class ConcurrentBag implements AutoCloseable {
         return System.nanoTime();
     }
 
+    public void remove(ConcurrentBagEntry entry) {
+        entry.setState(ConcurrentBagEntry.STATE_REMOVED);
+        sharedList.forEach(it -> {
+            if(it.getId().equals(entry.getId())) {
+                sharedList.remove(it);
+            }
+        });
+
+        handoffQueue.forEach(it -> {
+            if(it.getId().equals(entry.getId())) {
+                handoffQueue.remove(it);
+            }
+        });
+        mapping.remove(entry);
+    }
+
     public void remove(String ip) {
         sharedList.forEach(it -> {
             if(it.getIp().equals(ip)) {
@@ -227,6 +243,7 @@ public class ConcurrentBag implements AutoCloseable {
             }
         }
     }
+
 
 
 }
