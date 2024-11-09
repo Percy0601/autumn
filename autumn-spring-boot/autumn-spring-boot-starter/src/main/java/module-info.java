@@ -8,5 +8,6 @@ module autumn.spring.boot.starter {
     requires org.slf4j;
     requires transitive java.compiler;
     requires transitive autumn.core;
+    requires spring.beans;
 
 }
