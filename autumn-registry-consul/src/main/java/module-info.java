@@ -4,6 +4,8 @@
  */
 module autumn.registry.consul {
     requires lombok;
+    requires org.slf4j;
+    requires org.apache.thrift;
     requires autumn.api;
     requires autumn.core;
     requires org.apache.httpcomponents.core5.httpcore5;

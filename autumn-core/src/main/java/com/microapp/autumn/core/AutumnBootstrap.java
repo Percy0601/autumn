@@ -2,11 +2,7 @@ package com.microapp.autumn.core;
 
 import java.util.Objects;
 
-import org.apache.thrift.TServiceClient;
-
-import com.microapp.autumn.api.Discovery;
 import com.microapp.autumn.api.config.ApplicationConfig;
-import com.microapp.autumn.api.config.ReferenceConfig;
 import com.microapp.autumn.api.util.SpiUtil;
 import com.microapp.autumn.core.server.AutumnProvider;
 

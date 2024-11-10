@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @SupportedAnnotationTypes(value = {"com.microapp.autumn.core.annotation.Reference"})
-@SupportedSourceVersion(value = SourceVersion.RELEASE_11)
+@SupportedSourceVersion(value = SourceVersion.RELEASE_17)
 public class ReferenceServiceProcessor extends AbstractProcessor {
     private Logger log = LoggerFactory.getLogger(ReferenceServiceProcessor.class);
     private volatile AtomicBoolean executed = new AtomicBoolean(false);

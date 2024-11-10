@@ -7,8 +7,8 @@ module autumn.api {
     requires java.management;
     requires java.annotation;
     requires lombok;
-    requires transitive org.slf4j;
-    requires transitive org.apache.thrift;
+    requires org.slf4j;
+    requires org.apache.thrift;
 
     exports com.microapp.autumn.api.config;
     exports com.microapp.autumn.api.util;

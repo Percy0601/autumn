@@ -8,5 +8,4 @@ module autumn.sample {
     requires lombok;
     requires transitive autumn.core;
     exports com.microapp.autumn.sample.api;
-    exports com.microapp.autumn.sample.service;
 }

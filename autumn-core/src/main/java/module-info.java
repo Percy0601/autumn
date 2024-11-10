@@ -4,6 +4,8 @@
  */
 module autumn.core {
     requires lombok;
+    requires org.slf4j;
+    requires org.apache.thrift;
     requires transitive autumn.api;
 
     exports com.microapp.autumn.core.server;

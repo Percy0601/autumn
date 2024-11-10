@@ -1,4 +1,4 @@
-package com.microapp.autumn.compiler;
+package com.microapp.autumn.sample.boot.provider;
 
 import java.util.List;
 import java.util.Set;
@@ -21,7 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @SupportedAnnotationTypes(value = {"com.microapp.autumn.api.annotation.Export"})
-@SupportedSourceVersion(value = SourceVersion.RELEASE_17)
+@SupportedSourceVersion(value = SourceVersion.RELEASE_11)
 public class ExportServiceProcessor extends AbstractProcessor {
     private Logger log = LoggerFactory.getLogger(ExportServiceProcessor.class);
 
@@ -32,6 +32,7 @@ public class ExportServiceProcessor extends AbstractProcessor {
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
+        System.out.println("######################################################");
         super.init(processingEnvironment);
         mFilerUtils = processingEnv.getFiler();
         mTypesUtils = processingEnv.getTypeUtils();
@@ -40,7 +41,7 @@ public class ExportServiceProcessor extends AbstractProcessor {
     }
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        System.out.println("##############################");
+        System.out.println("######################################################");
 
         log.info("begin handle export annotation process");
         for (TypeElement annotationElement: annotations) {

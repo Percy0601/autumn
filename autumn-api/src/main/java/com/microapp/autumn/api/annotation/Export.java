@@ -2,15 +2,14 @@ package com.microapp.autumn.api.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
  * export service
  */
 @Target({ElementType.TYPE})
-@Retention(RUNTIME)
+@Retention(RetentionPolicy.SOURCE)
 public @interface Export {
     String name() default "";
 }
