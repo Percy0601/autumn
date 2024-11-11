@@ -3,6 +3,7 @@ package com.microapp.autumn.compiler;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Resource;
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
 import javax.annotation.processing.Messager;
@@ -41,7 +42,6 @@ public class ExportServiceProcessor extends AbstractProcessor {
     }
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        log.info("begin handle export annotation process");
         for (TypeElement annotationElement: annotations) {
             Set<? extends Element> annotatedClasses = roundEnv.getElementsAnnotatedWith(annotationElement);
             for(Element annotatedClass: annotatedClasses) {
@@ -52,13 +52,9 @@ public class ExportServiceProcessor extends AbstractProcessor {
     }
 
     private void handleAnnotationClass(TypeElement annotationElement, Element annotatedClass) {
-        log.info("begin handle Export:{}", annotatedClass);
-        if(!annotationElement.toString().equals("autumn.core.annotation.Export")) {
-            return;
-        }
-        TypeElement te = (TypeElement) annotatedClass;
-        List<? extends TypeMirror> interfaces = te.getInterfaces();
-        //MetaHolder.addExportService(annotatedClass.toString(), interfaces);
+        log.info("begin handle annotation Export:{}", annotatedClass);
+//        Resource r = annotatedClass.getAnnotation(Resource.class);
+//        log.info(r.name());
     }
 
 

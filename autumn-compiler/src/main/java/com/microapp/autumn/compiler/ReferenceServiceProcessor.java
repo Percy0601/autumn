@@ -4,6 +4,7 @@ import com.microapp.autumn.api.annotation.Reference;
 import com.microapp.autumn.compiler.model.MethodElement;
 import com.microapp.autumn.compiler.model.ReferenceEntry;
 import com.microapp.autumn.compiler.util.ClassNameUtil;
+import com.microapp.autumn.compiler.util.FreemarkerUtil;
 import com.microapp.autumn.compiler.util.MetaHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

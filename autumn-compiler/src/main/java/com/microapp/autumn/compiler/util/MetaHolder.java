@@ -63,15 +63,15 @@ public class MetaHolder {
             return entries;
         }
         exportServices.forEach((k, v) -> {
-            ExportEntry entry = new ExportEntry();
-            entry.setImplClassName(k);
-            String interfaceName = getThriftInterfaceName(k);
-            entry.setInterfaceName(interfaceName);
-            String simpleClassName = ClassNameUtil.getSimpleClassName(k);
-            String paramName = ClassNameUtil.getParamName(simpleClassName);
-            entry.setParamName(paramName + "_");
-            entry.setRegisterName(interfaceName + "$");
-            entries.add(entry);
+//            ExportEntry entry = new ExportEntry();
+//            entry.setImplClassName(k);
+//            String interfaceName = getThriftInterfaceName(k);
+//            entry.setInterfaceName(interfaceName);
+//            String simpleClassName = ClassNameUtil.getSimpleClassName(k);
+//            String paramName = ClassNameUtil.getParamName(simpleClassName);
+//            entry.setParamName(paramName + "_");
+//            entry.setRegisterName(interfaceName + "$");
+//            entries.add(entry);
         });
         return entries;
     }
