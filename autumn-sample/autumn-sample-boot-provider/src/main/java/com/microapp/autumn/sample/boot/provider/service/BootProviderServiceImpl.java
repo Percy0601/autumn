@@ -13,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
  * @author: baoxin.zhao
  * @date: 2024/10/8
  */
-@Export
 @Slf4j
 public class BootProviderServiceImpl implements SomeService.Iface {
     @Override

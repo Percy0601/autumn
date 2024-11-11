@@ -32,6 +32,7 @@ public class ExportServiceProcessor extends AbstractProcessor {
 
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
+        log.info("begin handle export annotation process init.");
         super.init(processingEnvironment);
         mFilerUtils = processingEnv.getFiler();
         mTypesUtils = processingEnv.getTypeUtils();
@@ -40,8 +41,6 @@ public class ExportServiceProcessor extends AbstractProcessor {
     }
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
-        System.out.println("##############################");
-
         log.info("begin handle export annotation process");
         for (TypeElement annotationElement: annotations) {
             Set<? extends Element> annotatedClasses = roundEnv.getElementsAnnotatedWith(annotationElement);
