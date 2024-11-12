@@ -55,6 +55,8 @@ public class ExportServiceProcessor extends AbstractProcessor {
         log.info("begin handle annotation Export:{}", annotatedClass);
 //        Resource r = annotatedClass.getAnnotation(Resource.class);
 //        log.info(r.name());
+        annotatedClass.accept()
+        annotatedClass.getEnclosedElements();
     }
 
 
