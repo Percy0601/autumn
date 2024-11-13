@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Export
-@Service
+@Service("someServiceImpl01")
 public class SomeServiceImpl implements SomeService.Iface {
     @Override
     public String echo(String msg) throws TException {
