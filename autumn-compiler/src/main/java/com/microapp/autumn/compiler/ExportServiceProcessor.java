@@ -55,13 +55,13 @@ public class ExportServiceProcessor extends AbstractProcessor {
         for (TypeElement annotationElement: annotations) {
             Set<? extends Element> annotatedClasses = roundEnv.getElementsAnnotatedWith(annotationElement);
             for(Element annotatedClass: annotatedClasses) {
-                handleAnnotationClass(annotationElement, annotatedClass);
+                handleAnnotationClass(annotatedClass);
             }
         }
         return true;
     }
 
-    private void handleAnnotationClass(TypeElement annotationElement, Element annotatedClass) {
+    private void handleAnnotationClass(Element annotatedClass) {
         log.info("begin handle annotation Export:{}", annotatedClass.getSimpleName().toString());
         String fullName = annotatedClass.asType().toString();
         TargetClass targetClass = new TargetClass();
@@ -95,7 +95,7 @@ public class ExportServiceProcessor extends AbstractProcessor {
             });
         }
 
-        annotatedClass.getEnclosedElements();
+        List<? extends Element> elements = annotatedClass.getEnclosedElements();
         log.info("====================={}", targetClass);
     }
 
