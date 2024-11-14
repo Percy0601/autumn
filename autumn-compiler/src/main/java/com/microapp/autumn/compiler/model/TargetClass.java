@@ -15,6 +15,7 @@ public class TargetClass {
     private String name;
     private String fullName;
     private String packageName;
+    private List<String> interfaces;
     private List<TargetAnnotation> annotations;
 
 }

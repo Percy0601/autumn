@@ -18,6 +18,9 @@ import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.TypeParameterElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
@@ -61,16 +64,34 @@ public class ExportServiceProcessor extends AbstractProcessor {
 
     private void handleAnnotationClass(Element annotatedClass) {
         log.info("begin handle annotation Export:{}", annotatedClass.getSimpleName().toString());
+        // ==========================begin handle basic==========================
         String fullName = annotatedClass.asType().toString();
         TargetClass targetClass = new TargetClass();
         targetClass.setName(annotatedClass.getSimpleName().toString());
         targetClass.setFullName(fullName);
         targetClass.setPackageName(ClassNameUtil.getPackageName(fullName));
+        // ==========================end handle basic==========================
 
+        // ==========================end handle basic==========================
+        List<String> interfaces = new ArrayList<>();
+        targetClass.setInterfaces(interfaces);
+        if(annotatedClass instanceof TypeElement) {
+            TypeElement typeElement = (TypeElement)annotatedClass;
+            List<? extends TypeMirror> interfaceMirrors = typeElement.getInterfaces();
+            interfaceMirrors.forEach(it -> {
+                if(it instanceof DeclaredType) {
+                    DeclaredType dt = (DeclaredType)it;
+                    String interfaceName = dt.asElement().toString();
+                    interfaces.add(interfaceName);
+                }
+            });
+        }
+
+        // ==========================begin handle annotation==========================
         List<TargetAnnotation> annotations = new ArrayList<>();
         targetClass.setAnnotations(annotations);
-
         List<? extends AnnotationMirror> mirrors = annotatedClass.getAnnotationMirrors();
+        annotatedClass.getEnclosingElement();
         for(AnnotationMirror mirror: mirrors) {
             TargetAnnotation annotation = new TargetAnnotation();
             annotation.setType(mirror.getAnnotationType().toString());
@@ -92,8 +113,14 @@ public class ExportServiceProcessor extends AbstractProcessor {
                 attributes.add(attribute);
             });
         }
+        // ==========================end handle annotation==========================
 
+        // handle field and method
         List<? extends Element> elements = annotatedClass.getEnclosedElements();
+
+
+
+
         log.info("====================={}", targetClass);
     }
 
