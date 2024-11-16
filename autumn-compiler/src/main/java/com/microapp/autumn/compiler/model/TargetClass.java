@@ -2,8 +2,6 @@ package com.microapp.autumn.compiler.model;
 
 import java.util.List;
 
-import javax.lang.model.element.AnnotationMirror;
-
 import lombok.Data;
 
 /**
@@ -15,7 +13,7 @@ public class TargetClass {
     private String name;
     private String fullName;
     private String packageName;
-    private List<String> interfaces;
+    private List<String> implementList;
     private List<TargetAnnotation> annotations;
-
+    private List<TargetMethod> methods;
 }

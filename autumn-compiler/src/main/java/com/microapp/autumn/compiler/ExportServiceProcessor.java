@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
@@ -19,17 +20,21 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.Types;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.microapp.autumn.compiler.model.TargetAnnotation;
 import com.microapp.autumn.compiler.model.TargetAnnotationAttribute;
 import com.microapp.autumn.compiler.model.TargetClass;
+import com.microapp.autumn.compiler.model.TargetMethod;
+import com.microapp.autumn.compiler.model.TargetVariable;
 import com.microapp.autumn.compiler.util.ClassNameUtil;
 
 @SupportedAnnotationTypes(value = {"com.microapp.autumn.api.annotation.Export"})
@@ -74,7 +79,7 @@ public class ExportServiceProcessor extends AbstractProcessor {
 
         // ==========================end handle basic==========================
         List<String> interfaces = new ArrayList<>();
-        targetClass.setInterfaces(interfaces);
+        targetClass.setImplementList(interfaces);
         if(annotatedClass instanceof TypeElement) {
             TypeElement typeElement = (TypeElement)annotatedClass;
             List<? extends TypeMirror> interfaceMirrors = typeElement.getInterfaces();
@@ -115,17 +120,46 @@ public class ExportServiceProcessor extends AbstractProcessor {
         }
         // ==========================end handle annotation==========================
 
-        // handle field and method
+        // ==========================begin handle field and method==========================
+        List<TargetMethod> methods = new ArrayList<>();
+        targetClass.setMethods(methods);
         List<? extends Element> elements = annotatedClass.getEnclosedElements();
+        elements.forEach(it -> {
+            if(it instanceof ExecutableElement) {
 
+                TargetMethod method = new TargetMethod();
+                ExecutableElement ee = (ExecutableElement)it;
+                String name = ee.getSimpleName().toString();
+                if(name.equals("<init>")) {
+                    return;
+                }
+                method.setName(name);
+                List<TargetVariable> variables = new ArrayList<>();
+                method.setVariables(variables);
+                List<? extends VariableElement> vars = ee.getParameters();
+                vars.forEach(v -> {
+                    TargetVariable variable = new TargetVariable();
+                    String varName = v.getSimpleName().toString();
+                    variable.setName(varName);
+                    String typeName = v.asType().toString();
+                    variable.setType(typeName);
+                    variables.add(variable);
+                });
+                TypeMirror returnType = ee.getReturnType();
+                method.setReturnType(returnType.toString());
 
+                List<? extends TypeMirror> thrownTypes = ee.getThrownTypes();
 
+                List<String> exceptions = thrownTypes.stream()
+                        .map(TypeMirror::toString)
+                        .collect(Collectors.toList());
+                method.setExceptions(exceptions);
+                methods.add(method);
+            }
+        });
+        // ==========================end handle field and method==========================
 
         log.info("====================={}", targetClass);
     }
-
-
-
-
 
 }

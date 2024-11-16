@@ -11,6 +11,7 @@ module autumn.compiler {
 
     requires transitive java.compiler;
     requires transitive autumn.core;
+    requires org.apache.commons.collections4;
 
     exports com.microapp.autumn.compiler;
 }
