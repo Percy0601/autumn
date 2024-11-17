@@ -7,5 +7,7 @@ module autumn.sample {
     requires org.slf4j;
     requires lombok;
     requires transitive autumn.core;
+    requires org.apache.thrift;
     exports com.microapp.autumn.sample.api;
+
 }

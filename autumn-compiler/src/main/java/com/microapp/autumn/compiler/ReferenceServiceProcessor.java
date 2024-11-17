@@ -3,7 +3,9 @@ package com.microapp.autumn.compiler;
 import com.microapp.autumn.api.annotation.Reference;
 import com.microapp.autumn.compiler.model.MethodElement;
 import com.microapp.autumn.compiler.model.ReferenceEntry;
+import com.microapp.autumn.compiler.model.TargetClass;
 import com.microapp.autumn.compiler.util.ClassNameUtil;
+import com.microapp.autumn.compiler.util.ClassResolverUtil;
 import com.microapp.autumn.compiler.util.FreemarkerUtil;
 import com.microapp.autumn.compiler.util.MetaHolder;
 import org.slf4j.Logger;
@@ -23,6 +25,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.tools.JavaFileObject;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -31,20 +34,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @SupportedSourceVersion(value = SourceVersion.RELEASE_17)
 public class ReferenceServiceProcessor extends AbstractProcessor {
     private Logger log = LoggerFactory.getLogger(ReferenceServiceProcessor.class);
-    private volatile AtomicBoolean executed = new AtomicBoolean(false);
+    private Map<String, ReferenceEntry> mapping = new ConcurrentHashMap<>();
+
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         log.info("begin handle reference annotation.");
-
         for (TypeElement annotationElement: annotations) {
             Set<? extends Element> annotatedClasses = roundEnv.getElementsAnnotatedWith(annotationElement);
             for(Element annotatedClass: annotatedClasses) {
-                //handleAnnotationClass(annotationElement, annotatedClass);
+                TargetClass targetClass = ClassResolverUtil.handle(annotatedClass);
             }
         }
-        if(!executed.getAndSet(true)) {
-            //handleWrite();
-        }
+
 
         return true;
     }
@@ -61,6 +62,7 @@ public class ReferenceServiceProcessor extends AbstractProcessor {
                 String packageName = ClassNameUtil.getPackageName(sourceName);
                 String simpleClassName = ClassNameUtil.getSimpleClassName(sourceName);
                 JavaFileObject builderFile = processingEnv.getFiler().createSourceFile(packageName + "._" + simpleClassName + "Proxy");
+
 //                FreemarkerUtil.handleProxy(k, v, builderFile.openWriter());
                 JavaFileObject builderFactoryFile = processingEnv.getFiler().createSourceFile(packageName + "._" + simpleClassName + "PoolFactory");
 //                FreemarkerUtil.handlePoolFactory(k, v, builderFactoryFile.openWriter());
