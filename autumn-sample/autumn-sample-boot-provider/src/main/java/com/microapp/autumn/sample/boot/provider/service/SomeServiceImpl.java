@@ -22,8 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service("someServiceImpl01")
 public class SomeServiceImpl implements SomeService.Iface {
 
-//    @Autowired
-//    SomeService.Iface someService;
+    @Reference
+    SomeService.Iface someService;
     @Override
     public String echo(String msg) throws TException {
         return "msg";
