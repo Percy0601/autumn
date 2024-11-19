@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Export
-@Service("someServiceImpl01")
+@Service
 public class SomeServiceImpl implements SomeService.Iface {
 
     @Reference
