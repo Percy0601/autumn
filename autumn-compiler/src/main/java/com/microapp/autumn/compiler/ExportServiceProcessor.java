@@ -1,6 +1,8 @@
 package com.microapp.autumn.compiler;
 
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Filer;
@@ -30,7 +32,7 @@ public class ExportServiceProcessor extends AbstractProcessor {
     private Types mTypesUtils;
     private Elements mElementsUtils;
     private Messager mMessager;
-
+    private Map<String, TargetClass> mapping = new ConcurrentHashMap<>();
     @Override
     public synchronized void init(ProcessingEnvironment processingEnvironment) {
         log.info("begin handle export annotation process init.");
@@ -46,7 +48,10 @@ public class ExportServiceProcessor extends AbstractProcessor {
             Set<? extends Element> annotatedClasses = roundEnv.getElementsAnnotatedWith(annotationElement);
             for(Element annotatedClass: annotatedClasses) {
                 TargetClass targetClass = ClassResolverUtil.handle(annotatedClass);
-
+                if(mapping.containsKey(targetClass.getFullName())) {
+                    return true;
+                }
+                mapping.put(targetClass.getFullName(), targetClass);
 
             }
         }
