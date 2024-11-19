@@ -47,7 +47,7 @@ public class ExportServiceProcessor extends AbstractProcessor {
         for (TypeElement annotationElement: annotations) {
             Set<? extends Element> annotatedClasses = roundEnv.getElementsAnnotatedWith(annotationElement);
             for(Element annotatedClass: annotatedClasses) {
-                TargetClass targetClass = ClassResolverUtil.handle(annotatedClass);
+                TargetClass targetClass = ClassResolverUtil.handleExport(annotatedClass);
                 if(mapping.containsKey(targetClass.getFullName())) {
                     return true;
                 }

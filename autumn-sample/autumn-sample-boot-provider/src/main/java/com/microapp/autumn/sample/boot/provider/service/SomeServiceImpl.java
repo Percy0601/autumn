@@ -22,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class SomeServiceImpl implements SomeService.Iface {
 
-    @Reference
+    @Reference(refer = "consumer")
     SomeService.Iface someService;
     @Override
     public String echo(String msg) throws TException {

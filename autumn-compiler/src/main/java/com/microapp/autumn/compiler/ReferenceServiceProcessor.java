@@ -30,7 +30,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-@SupportedAnnotationTypes(value = {"com.microapp.autumn.core.annotation.Reference"})
+@SupportedAnnotationTypes(value = {"com.microapp.autumn.api.annotation.Reference"})
 @SupportedSourceVersion(value = SourceVersion.RELEASE_17)
 public class ReferenceServiceProcessor extends AbstractProcessor {
     private Logger log = LoggerFactory.getLogger(ReferenceServiceProcessor.class);
@@ -42,7 +42,7 @@ public class ReferenceServiceProcessor extends AbstractProcessor {
         for (TypeElement annotationElement: annotations) {
             Set<? extends Element> annotatedClasses = roundEnv.getElementsAnnotatedWith(annotationElement);
             for(Element annotatedClass: annotatedClasses) {
-                TargetClass targetClass = ClassResolverUtil.handle(annotatedClass);
+                TargetClass targetClass = ClassResolverUtil.handleReference(annotatedClass);
             }
         }
 
