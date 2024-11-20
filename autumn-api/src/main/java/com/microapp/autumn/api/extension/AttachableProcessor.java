@@ -23,7 +23,7 @@ public class AttachableProcessor implements TProcessor {
             TMessage message = serverProtocol.readMessageBegin();
             serverProtocol.readFieldZero();
             Map<String, String> headInfo = serverProtocol.getAttachment();
-            log.info("读取到的隐式参数:{}", headInfo);
+            log.info("read attachment content:{}", headInfo);
 //            String traceId = headInfo.get(TRACE_ID.getValue());
 //            String parentSpanId = headInfo.get(PARENT_SPAN_ID.getValue());
 //            String isSampled = headInfo.get(IS_SAMPLED.getValue());

@@ -73,7 +73,6 @@ public class ReferenceServiceProcessor extends AbstractProcessor {
     }
 
     private void handleAnnotationClass(TypeElement annotationElement, Element annotatedClass) {
-        log.info("开始处理注解类Reference:{}", annotatedClass);
         if(!annotationElement.toString().equals("autumn.core.annotation.Reference")) {
             return;
         }
@@ -83,7 +82,6 @@ public class ReferenceServiceProcessor extends AbstractProcessor {
         DeclaredType interfaceClass = (DeclaredType)executableElement.getReturnType();
         List<? extends Element> elements = interfaceClass.asElement().getEnclosedElements();
         if(elements.isEmpty()) {
-            log.info("处理Reference, 类名称:{}中没有任何方法", interfaceClass);
             return;
         }
         List<MethodElement> methodElements = new ArrayList<>();
