@@ -21,9 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MulticastRegistry implements Registry {
     private static volatile MulticastRegistry instance;
-    private MulticastRegistry() {
 
-    }
     public static MulticastRegistry provider() {
         if(Objects.isNull(instance)) {
             synchronized (MulticastRegistry.class) {

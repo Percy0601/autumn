@@ -35,11 +35,11 @@ public class TrainingTest {
     @Test
     void testProvider() {
         log.info("========================");
-//        ServiceConfig<SomeService.Iface> fooServiceConfig = new ServiceConfig<>();
-//        fooServiceConfig.setInterfaceClass(SomeService.Iface.class);
-//        TProcessor tprocessor = new SomeService.Processor<SomeService.Iface>(new SomeServiceImpl());
-//        AttachableProcessor attachableProcessor = new AttachableProcessor(tprocessor);
-//        fooServiceConfig.setRef(attachableProcessor);
+        ServiceConfig<SomeService.Iface> fooServiceConfig = new ServiceConfig<>();
+        fooServiceConfig.setInterfaceClass(SomeService.Iface.class);
+        TProcessor tprocessor = new SomeService.Processor<SomeService.Iface>(new SomeServiceImpl());
+        AttachableProcessor attachableProcessor = new AttachableProcessor(tprocessor);
+        fooServiceConfig.setRef(attachableProcessor);
         AutumnBootstrap.getInstance().serve();
 
         try {
@@ -52,7 +52,7 @@ public class TrainingTest {
 
     @Test
     void testConsumer() {
-        String ip = "192.168.1.9";
+        String ip = "192.168.1.14";
         Integer port = 30880;
 
         SpiUtil.discovery();

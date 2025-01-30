@@ -12,9 +12,9 @@ module autumn.core {
     exports com.microapp.autumn.core;
     exports com.microapp.autumn.core.pool;
 
-    provides com.microapp.autumn.api.Registry with
-            com.microapp.autumn.core.registry.MulticastRegistry;
-    provides com.microapp.autumn.api.Discovery with
-            com.microapp.autumn.core.registry.client.MulticastDiscovery;
+//    provides com.microapp.autumn.api.Registry with
+//            com.microapp.autumn.core.registry.MulticastRegistry;
+//    provides com.microapp.autumn.api.Discovery with
+//            com.microapp.autumn.core.registry.client.MulticastDiscovery;
 
 }

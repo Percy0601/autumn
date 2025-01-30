@@ -51,9 +51,6 @@ public class MulticastDiscovery implements Discovery {
     private AtomicBoolean initStatus = new AtomicBoolean(false);
     private MulticastSocket mc;
 
-    private MulticastDiscovery() {
-
-    }
 
     public static MulticastDiscovery provider() {
         if(Objects.isNull(instance)) {
