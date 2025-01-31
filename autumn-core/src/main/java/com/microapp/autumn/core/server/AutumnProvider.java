@@ -53,10 +53,11 @@ public class AutumnProvider {
     }
 
     private void export(String name, TProcessor serviceProcessor) {
-
         if(services.containsKey(name)) {
+            log.warn("autumn provider processor contains the service, not need repeat export service. service-name:{}", name);
             return;
         }
+        log.info("autumn provider export service: {}", name);
         processor.registerProcessor(name, serviceProcessor);
     }
 
@@ -72,13 +73,6 @@ public class AutumnProvider {
         providerConfig.init(properties);
         services = new ConcurrentHashMap<>();
         processor = new TMultiplexedProcessor();
-//        ServiceConfig<ControlApi.Iface> controlApiService = new ServiceConfig();
-//        controlApiService.setInterfaceClass(ControlApi.Iface.class);
-//        TProcessor controlProcessor = new ControlApi.Processor<ControlApi.Iface>(new ControlApiImpl());
-//        AttachableProcessor attachableProcessor = new AttachableProcessor(controlProcessor);
-//        controlApiService.setRef(attachableProcessor);
-//        service(controlApiService);
-
     }
 
     public void start() {
@@ -108,8 +102,8 @@ public class AutumnProvider {
                 controlApiService.setRef(controlProcessor);
                 service(controlApiService);
                 TServer server = new TThreadedSelectorServer(tArgs);
+                log.info("autumn server running, services:{}", services.keySet());
                 server.serve();
-                log.info("autumn server running");
             } catch (TTransportException e) {
                 log.warn("autumn server start exception, exception:", e);
                 throw new RuntimeException(e);

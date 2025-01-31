@@ -36,6 +36,7 @@ public class MulticastRegistry implements Registry {
 
     @Override
     public Boolean register() {
+        log.info("autumn-multicast register init");
         return init();
     }
 
@@ -75,6 +76,7 @@ public class MulticastRegistry implements Registry {
         ApplicationConfig applicationConfig = ApplicationConfig.getInstance();
         String ip = applicationConfig.getMulticastIp();
         Integer port = applicationConfig.getMulticastPort();
+        log.info("autumn-multicast registry ip:{}, port:{}", ip, port);
         try {
             InetAddress group = InetAddress.getByName(ip);
             MulticastSocket mcs = new MulticastSocket(port);

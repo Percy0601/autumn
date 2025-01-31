@@ -3,6 +3,7 @@ package com.microapp.autumn.core;
 import java.util.Objects;
 
 import com.microapp.autumn.api.config.ApplicationConfig;
+import com.microapp.autumn.api.config.ServiceConfig;
 import com.microapp.autumn.api.util.SpiUtil;
 import com.microapp.autumn.core.server.AutumnProvider;
 
@@ -31,6 +32,12 @@ public class AutumnBootstrap {
             }
         }
         return instance;
+    }
+
+    public <T> AutumnBootstrap service(ServiceConfig<T> serviceConfig) {
+        AutumnProvider provider = AutumnProvider.provider();
+        provider.service(serviceConfig);
+        return this;
     }
 
     public void serve() {
