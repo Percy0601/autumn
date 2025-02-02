@@ -49,7 +49,9 @@ public class ControlApiImpl implements ControlApi.Iface {
         return result;
     }
 
-    public Boolean checkHealth(String ip, Integer port) {
+
+    @Override
+    public String check(String ip, int port) throws TException{
         TTransport transport = null;
         TTransport tsocket = null;
         try {
@@ -60,13 +62,13 @@ public class ControlApiImpl implements ControlApi.Iface {
             TMultiplexedProtocol multiplexedProtocol = new TMultiplexedProtocol(protocol, ControlApi.Iface.class.getName());
             ControlApi.Iface client = new ControlApi.Client(multiplexedProtocol);
             String result = client.health();
-            return "OK".equals(result);
+            return String.valueOf("OK".equals(result));
         } catch (TTransportException e) {
             log.warn("autumn check health connect exception: ", e);
-            return false;
+            return String.valueOf(Boolean.FALSE);
         } catch (TException e) {
             log.warn("autumn check health exception: ", e);
-            return false;
+            return String.valueOf(Boolean.FALSE);
         } finally {
             transport.close();
             tsocket.close();

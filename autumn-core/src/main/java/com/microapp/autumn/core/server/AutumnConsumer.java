@@ -34,9 +34,7 @@ public class AutumnConsumer {
 
     public <T extends TServiceClient> ConcurrentBagEntry reference(ReferenceConfig<T> referenceConfig) {
         Discovery discovery = SpiUtil.discovery();
-        discovery.reference(referenceConfig.getInterfaceClass(), referenceConfig);
         discovery.discovery();
-
 
         AutumnPool.getInstance().referenceConfig(referenceConfig);
         ConcurrentBagEntry entry = AutumnPool.getInstance().borrow(referenceConfig.getName());
