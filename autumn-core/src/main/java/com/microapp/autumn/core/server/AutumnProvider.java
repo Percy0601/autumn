@@ -19,6 +19,7 @@ import org.apache.thrift.transport.layered.TFramedTransport;
 import com.microapp.autumn.api.ControlApi;
 import com.microapp.autumn.api.config.ProviderConfig;
 import com.microapp.autumn.api.config.ServiceConfig;
+import com.microapp.autumn.api.extension.AttachableProcessor;
 import com.microapp.autumn.api.util.CommonUtil;
 import com.microapp.autumn.api.util.ThreadUtil;
 import com.microapp.autumn.core.devops.ControlApiImpl;
@@ -98,7 +99,7 @@ public class AutumnProvider {
                 ServiceConfig<ControlApi.Iface> controlApiService = new ServiceConfig();
                 controlApiService.setInterfaceClass(ControlApi.Iface.class);
                 TProcessor controlProcessor = new ControlApi.Processor<ControlApi.Iface>(new ControlApiImpl());
-                //AttachableProcessor attachableProcessor = new AttachableProcessor(controlProcessor);
+                AttachableProcessor attachableProcessor = new AttachableProcessor(controlProcessor);
                 controlApiService.setRef(controlProcessor);
                 service(controlApiService);
                 TServer server = new TThreadedSelectorServer(tArgs);

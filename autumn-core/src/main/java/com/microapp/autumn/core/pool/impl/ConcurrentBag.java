@@ -83,6 +83,10 @@ public class ConcurrentBag implements AutoCloseable {
         mayScale.set(false);
         Boolean nextScale = false;
 
+        if(Objects.isNull(consumerConfigs)) {
+            return false;
+        }
+
         for(ConsumerConfig consumerConfig: consumerConfigs) {
             AtomicInteger active = consumerConfig.getActive();
             if(Objects.isNull(active)) {
@@ -115,6 +119,7 @@ public class ConcurrentBag implements AutoCloseable {
         try {
             tsocket = new TSocket(ip, port);
             transport = new TFramedTransport(tsocket);
+            transport.open();
             ConcurrentBagEntry entry = new ConcurrentBagEntryImpl<>(name, ip, port, transport);
             return entry;
         } catch (TTransportException e) {

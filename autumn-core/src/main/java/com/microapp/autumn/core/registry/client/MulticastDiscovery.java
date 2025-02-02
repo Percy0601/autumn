@@ -107,54 +107,58 @@ public class MulticastDiscovery implements Discovery {
 
     private void discovery(MulticastSocket ms, InetAddress group, Integer port) {
         Runnable runnable = () -> {
-            try {
-                ms.joinGroup(group);
-                byte[] buffer = new byte[8192];
-                while (true) {
-                    DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
-                    ms.receive(dp);
-                    String ip = dp.getAddress().getHostAddress();
-                    String data = new String(dp.getData(), 0, dp.getLength());
-                    int i = data.indexOf('\n');
-                    if (i > 0) {
-                        data = data.substring(0, i).trim();
-                    }
-                    Arrays.fill(buffer, (byte) 0);
-                    Map<String, String> params = ConverterUtil.getUrlParams(data);
-                    if(ConverterUtil.MULTICAST_REQUEST.equals(params.get(ConverterUtil.CONSTANT_URL_PATH))) {
-                        receive(ip, data, MulticastEventEnum.REGISTRY);
-                        ProviderConfig config = ProviderConfig.getInstance();
-                        String registryResponse = ConverterUtil.registryResponse(config);
-                        byte[] sendBuff = registryResponse.getBytes();
-                        DatagramPacket sendPacket = new DatagramPacket(sendBuff, sendBuff.length, group, port);
-                        mc.send(sendPacket);
-                        Arrays.fill(sendBuff, (byte) 0);
-                        return;
-                    }
-
-                    if(ConverterUtil.MULTICAST_SHUTDOWN_REQUEST.equals(params.get(ConverterUtil.CONSTANT_URL_PATH))) {
-                        receive(ip, data, MulticastEventEnum.SHUTDOWN);
-                    }
-
-                }
-            } catch (IOException e) {
-                log.warn("autumn-multicast-discovery receive exception: ", e);
-            } finally {
-                if (ms != null) {
-                    try {
-                        ms.leaveGroup(group);
-                        ms.close();
-                    } catch (IOException e) {
-                        log.warn("autumn-multicast-discovery receive exception: ", e);
-                    }
-                }
-            }
+            handleDiscovery(ms, group, port);
         };
 
         Thread thread = new Thread(runnable, "autumn-multicast-registry-receiver");
         thread.setDaemon(true);
         thread.start();
         log.info("autumn-multicast-registry begin listening");
+    }
+
+    private void handleDiscovery(MulticastSocket ms, InetAddress group, Integer port) {
+        try {
+            ms.joinGroup(group);
+            byte[] buffer = new byte[8192];
+            while (true) {
+                DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
+                ms.receive(dp);
+                String ip = dp.getAddress().getHostAddress();
+                String data = new String(dp.getData(), 0, dp.getLength());
+                int i = data.indexOf('\n');
+                if (i > 0) {
+                    data = data.substring(0, i).trim();
+                }
+                Arrays.fill(buffer, (byte) 0);
+                Map<String, String> params = ConverterUtil.getUrlParams(data);
+                if(ConverterUtil.MULTICAST_REQUEST.equals(params.get(ConverterUtil.CONSTANT_URL_PATH))) {
+                    receive(ip, data, MulticastEventEnum.REGISTRY);
+                    ProviderConfig config = ProviderConfig.getInstance();
+                    String registryResponse = ConverterUtil.registryResponse(config);
+                    byte[] sendBuff = registryResponse.getBytes();
+                    DatagramPacket sendPacket = new DatagramPacket(sendBuff, sendBuff.length, group, port);
+                    mc.send(sendPacket);
+                    Arrays.fill(sendBuff, (byte) 0);
+                    return;
+                }
+
+                if(ConverterUtil.MULTICAST_SHUTDOWN_REQUEST.equals(params.get(ConverterUtil.CONSTANT_URL_PATH))) {
+                    receive(ip, data, MulticastEventEnum.SHUTDOWN);
+                }
+
+            }
+        } catch (IOException e) {
+            log.warn("autumn-multicast-discovery receive exception: ", e);
+        } finally {
+            if (ms != null) {
+                try {
+                    ms.leaveGroup(group);
+                    ms.close();
+                } catch (IOException e) {
+                    log.warn("autumn-multicast-discovery receive exception: ", e);
+                }
+            }
+        }
     }
 
     private void receive(String ip, String data, MulticastEventEnum eventEnum) {
@@ -189,7 +193,7 @@ public class MulticastDiscovery implements Discovery {
 
     @Override
     public List<ConsumerConfig> getInstances(String name) {
-        ReferenceConfig<? extends TServiceClient> config =AutumnPool.getInstance().getReferenceConfig(name);
+        ReferenceConfig<? extends TServiceClient> config = AutumnPool.getInstance().getReferenceConfig(name);
         if(Objects.isNull(config)) {
             return null;
         }
