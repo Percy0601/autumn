@@ -2,6 +2,7 @@ package com.microapp.autumn.core.registry.client;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import org.apache.thrift.TServiceClient;
 
@@ -36,14 +37,10 @@ public class ConsulDiscovery implements Discovery {
         log.info("begin discovery reference instances.");
     }
 
-    @Override
-    public <T extends TServiceClient> void reference(Class<T> classType, ReferenceConfig referenceConfig) {
-
-    }
 
     @Override
-    public List<String> services() {
-        return List.of();
+    public Set<String> services() {
+        return Set.of();
     }
 
     @Override
@@ -55,9 +52,5 @@ public class ConsulDiscovery implements Discovery {
         return config.getInstances();
     }
 
-    @Override
-    public Boolean checkHealth(String ip, Integer port) {
-        return null;
-    }
 
 }

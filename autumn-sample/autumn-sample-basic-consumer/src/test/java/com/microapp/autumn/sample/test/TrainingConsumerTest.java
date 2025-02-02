@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Test;
 
 
 import com.microapp.autumn.api.ControlApi;
+import com.microapp.autumn.api.Discovery;
 import com.microapp.autumn.api.config.ReferenceConfig;
 import com.microapp.autumn.api.enums.RegistryTypeEnum;
 import com.microapp.autumn.api.util.SpiUtil;
@@ -89,6 +90,12 @@ public class TrainingConsumerTest {
         } catch (TException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void testDiscovry(){
+        Discovery discovery = SpiUtil.discovery();
+        discovery.reference(referenceConfig.getInterfaceClass(), referenceConfig);
+        discovery.discovery();
     }
 
 }

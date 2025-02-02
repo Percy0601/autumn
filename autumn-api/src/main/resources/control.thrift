@@ -5,4 +5,5 @@ service ControlApi {
 	string applicationInfo();
 	string providerInfo();
 	string referenceConfig(1: required string name);
+    string check(1:required string ip, 2: required i32 port);
 }

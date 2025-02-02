@@ -9,7 +9,7 @@ import lombok.Setter;
 
 @Setter
 @Getter
-@EqualsAndHashCode(of = {"ip", "port"})
+@EqualsAndHashCode(of = {"name", "ip", "port"})
 public class ConsumerConfig {
     /**
      * reference service name

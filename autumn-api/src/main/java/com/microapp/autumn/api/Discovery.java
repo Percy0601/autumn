@@ -1,6 +1,7 @@
 package com.microapp.autumn.api;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.thrift.TServiceClient;
 
@@ -16,12 +17,8 @@ public interface Discovery {
 
     void discovery();
 
-    <T extends TServiceClient> void reference(Class<T> classType, ReferenceConfig referenceConfig);
-
-    List<String> services();
+    Set<String> services();
 
     List<ConsumerConfig> getInstances(String name);
-
-    Boolean checkHealth(String ip, Integer port);
 
 }
