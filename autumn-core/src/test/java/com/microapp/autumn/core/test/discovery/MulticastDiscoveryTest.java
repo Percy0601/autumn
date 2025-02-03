@@ -8,13 +8,18 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
+import java.util.ServiceLoader;
+import java.util.Set;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
 import com.microapp.autumn.api.Discovery;
 import com.microapp.autumn.api.config.ApplicationConfig;
+import com.microapp.autumn.api.config.ConsumerConfig;
 import com.microapp.autumn.api.config.ProviderConfig;
 import com.microapp.autumn.api.util.CommonUtil;
 import com.microapp.autumn.api.util.SpiUtil;
@@ -27,6 +32,31 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class MulticastDiscoveryTest {
+
+
+    //@Test
+    void testDiscovery() {
+        Discovery discovery = SpiUtil.discovery();
+        discovery.discovery();
+
+        while (true) {
+            Set<String> services = discovery.services();
+            log.info("discovery:{}", discovery.services());
+            services.forEach(it -> {
+                List<ConsumerConfig> consumers = discovery.getInstances(it);
+                log.info("service:{}, consumers:{}", it, consumers);
+            });
+
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+    }
+
+
 
     @Test
     void testNetworkInterface() {
@@ -52,7 +82,6 @@ public class MulticastDiscoveryTest {
         ProviderConfig providerConfig = ProviderConfig.getInstance();
         providerConfig.init(properties);
         Discovery multicastDiscovery = SpiUtil.discovery();
-        multicastDiscovery.reference(null, null);
 
         try {
             System.in.read();

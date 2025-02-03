@@ -22,7 +22,7 @@ public class AutumnConsumer {
 
     public static AutumnConsumer provider() {
         if (singleton == null) {
-            synchronized (AutumnProvider.class) {
+            synchronized (AutumnConsumer.class) {
                 if (singleton == null) {
                     singleton = new AutumnConsumer();
                     return singleton;

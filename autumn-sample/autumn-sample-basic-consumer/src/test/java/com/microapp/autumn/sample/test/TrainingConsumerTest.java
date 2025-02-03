@@ -1,7 +1,5 @@
 package com.microapp.autumn.sample.test;
 
-import java.util.function.Function;
-
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
@@ -10,21 +8,13 @@ import org.apache.thrift.protocol.TJSONProtocol;
 import org.apache.thrift.protocol.TMultiplexedProtocol;
 import org.apache.thrift.protocol.TProtocol;
 import org.apache.thrift.protocol.TSimpleJSONProtocol;
-import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
-import org.apache.thrift.transport.layered.TFramedTransport;
 import org.junit.jupiter.api.Test;
 
-
-import com.microapp.autumn.api.ControlApi;
-import com.microapp.autumn.api.Discovery;
 import com.microapp.autumn.api.config.ReferenceConfig;
 import com.microapp.autumn.api.enums.RegistryTypeEnum;
-import com.microapp.autumn.api.util.SpiUtil;
 import com.microapp.autumn.core.pool.impl.ConcurrentBagEntry;
-import com.microapp.autumn.core.pool.impl.ConcurrentBagEntryImpl;
-import com.microapp.autumn.core.registry.client.MulticastDiscovery;
 import com.microapp.autumn.core.server.AutumnConsumer;
 import com.microapp.autumn.sample.api.SomeService;
 import com.microapp.autumn.sample.api.User;
@@ -40,10 +30,10 @@ public class TrainingConsumerTest {
 
     @Test
     void testConsumer() {
-        String ip = "192.168.1.14";
-        Integer port = 30880;
-        Boolean result = MulticastDiscovery.provider().checkHealth(ip, port);
-        log.info("===========check health result: {}", result);
+//        String ip = "192.168.1.14";
+//        Integer port = 30880;
+//        Boolean result = MulticastDiscovery.provider().checkHealth(ip, port);
+//        log.info("===========check health result: {}", result);
         AutumnConsumer consumer = AutumnConsumer.provider();
 
 
@@ -92,10 +82,5 @@ public class TrainingConsumerTest {
         }
     }
 
-    public void testDiscovry(){
-        Discovery discovery = SpiUtil.discovery();
-        discovery.reference(referenceConfig.getInterfaceClass(), referenceConfig);
-        discovery.discovery();
-    }
 
 }
