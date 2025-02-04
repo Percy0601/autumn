@@ -1,4 +1,4 @@
-package com.microapp.autumn.core.registry.util;
+package com.microapp.autumn.core.registry.consul.client.util;
 
 import java.io.File;
 import java.io.IOException;

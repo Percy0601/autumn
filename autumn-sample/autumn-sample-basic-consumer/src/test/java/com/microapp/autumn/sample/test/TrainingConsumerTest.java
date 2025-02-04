@@ -1,5 +1,7 @@
 package com.microapp.autumn.sample.test;
 
+import java.util.Objects;
+
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
 import org.apache.thrift.TSerializer;
@@ -14,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import com.microapp.autumn.api.config.ReferenceConfig;
 import com.microapp.autumn.api.enums.RegistryTypeEnum;
+import com.microapp.autumn.core.pool.AutumnPool;
 import com.microapp.autumn.core.pool.impl.ConcurrentBagEntry;
 import com.microapp.autumn.core.server.AutumnConsumer;
 import com.microapp.autumn.sample.api.SomeService;
@@ -35,15 +38,29 @@ public class TrainingConsumerTest {
 //        Boolean result = MulticastDiscovery.provider().checkHealth(ip, port);
 //        log.info("===========check health result: {}", result);
         AutumnConsumer consumer = AutumnConsumer.provider();
-
-
         ReferenceConfig<SomeService.Client> referenceConfig = new ReferenceConfig<>();
         referenceConfig.setName("training-a");
         referenceConfig.setInterfaceClass(SomeService.Client.class);
         referenceConfig.setPoolTimeout(10000L);
-        referenceConfig.setRegistryTypeEnum(RegistryTypeEnum.DIRECT);
+        referenceConfig.setRegistryTypeEnum(RegistryTypeEnum.MULTICAST);
         referenceConfig.setSocketTimeout(3000L);
-        ConcurrentBagEntry entry = consumer.reference(referenceConfig);
+        consumer.reference(referenceConfig);
+
+        ConcurrentBagEntry entry = AutumnPool.getInstance().borrow(referenceConfig.getName());
+        if(Objects.isNull(entry)) {
+            for(int i = 0; i < 10; i++) {
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                entry = AutumnPool.getInstance().borrow(referenceConfig.getName());
+                if(Objects.nonNull(entry)) {
+                    break;
+                }
+            }
+        }
+
         TTransport transport = entry.getEntry();
         TProtocol protocol = new TBinaryProtocol(transport);
         TMultiplexedProtocol multiplexedProtocol = new TMultiplexedProtocol(protocol, SomeService.Iface.class.getName());

@@ -1,4 +1,4 @@
-package com.microapp.autumn.core.registry.model;
+package com.microapp.autumn.core.registry.consul.client.model;
 
 import java.util.List;
 import java.util.Map;

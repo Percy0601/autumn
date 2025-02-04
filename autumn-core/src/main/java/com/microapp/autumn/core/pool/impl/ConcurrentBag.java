@@ -16,9 +16,11 @@ import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.layered.TFramedTransport;
 
+import com.microapp.autumn.api.Discovery;
 import com.microapp.autumn.api.config.ConsumerConfig;
 import com.microapp.autumn.api.config.ReferenceConfig;
 import com.microapp.autumn.api.util.AutumnException;
+import com.microapp.autumn.api.util.SpiUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -79,6 +81,10 @@ public class ConcurrentBag implements AutoCloseable {
     }
 
     private Boolean scale() {
+        Discovery discovery = SpiUtil.discovery();
+        discovery.discovery();
+        List<ConsumerConfig> instances = discovery.getInstances(config.getName());
+        config.setInstances(instances);
         List<ConsumerConfig> consumerConfigs = config.getInstances();
         mayScale.set(false);
         Boolean nextScale = false;
@@ -95,6 +101,10 @@ public class ConcurrentBag implements AutoCloseable {
             } else {
                 active.incrementAndGet();
             }
+            if(Objects.isNull(consumerConfig.getConnections())) {
+                consumerConfig.setConnections(10);
+            }
+
             if(active.get() >= consumerConfig.getConnections().intValue()) {
                 continue;
             }

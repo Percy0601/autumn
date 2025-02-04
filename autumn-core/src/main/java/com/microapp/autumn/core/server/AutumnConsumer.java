@@ -1,5 +1,7 @@
 package com.microapp.autumn.core.server;
 
+import java.util.List;
+
 import org.apache.thrift.TServiceClient;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
@@ -7,6 +9,7 @@ import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.layered.TFramedTransport;
 
 import com.microapp.autumn.api.Discovery;
+import com.microapp.autumn.api.config.ConsumerConfig;
 import com.microapp.autumn.api.config.ReferenceConfig;
 import com.microapp.autumn.api.util.SpiUtil;
 import com.microapp.autumn.core.pool.AutumnPool;
@@ -32,13 +35,8 @@ public class AutumnConsumer {
         return singleton;
     }
 
-    public <T extends TServiceClient> ConcurrentBagEntry reference(ReferenceConfig<T> referenceConfig) {
-        Discovery discovery = SpiUtil.discovery();
-        discovery.discovery();
-
+    public <T extends TServiceClient> void reference(ReferenceConfig<T> referenceConfig) {
         AutumnPool.getInstance().referenceConfig(referenceConfig);
-        ConcurrentBagEntry entry = AutumnPool.getInstance().borrow(referenceConfig.getName());
-        return entry;
     }
 
     public static void requite(ConcurrentBagEntry bagEntry) {

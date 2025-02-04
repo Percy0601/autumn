@@ -12,4 +12,6 @@ module autumn.registry.consul {
     requires org.apache.httpcomponents.client5.httpclient5;
     requires com.fasterxml.jackson.databind;
 
+    uses com.microapp.autumn.api.Registry;
+    uses com.microapp.autumn.api.Discovery;
 }
