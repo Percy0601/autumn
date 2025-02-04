@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
@@ -19,6 +20,7 @@ import com.microapp.autumn.api.config.ApplicationConfig;
 import com.microapp.autumn.api.config.ConsumerConfig;
 import com.microapp.autumn.api.config.ProviderConfig;
 import com.microapp.autumn.api.enums.MulticastEventEnum;
+import com.microapp.autumn.api.util.CommonUtil;
 import com.microapp.autumn.api.util.ConverterUtil;
 
 import lombok.Getter;
@@ -109,6 +111,8 @@ public class MulticastDiscovery implements Discovery {
                 if(ConverterUtil.MULTICAST_REQUEST.equals(params.get(ConverterUtil.CONSTANT_URL_PATH))) {
                     receive(ip, data, MulticastEventEnum.REGISTRY);
                     ProviderConfig config = ProviderConfig.getInstance();
+                    Properties properties = CommonUtil.readClasspath("application.properties");
+                    config.init(properties);
                     String registryResponse = ConverterUtil.registryResponse(config);
                     byte[] sendBuff = registryResponse.getBytes();
                     DatagramPacket sendPacket = new DatagramPacket(sendBuff, sendBuff.length, group, port);
