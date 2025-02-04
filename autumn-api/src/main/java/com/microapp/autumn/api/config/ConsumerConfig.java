@@ -1,15 +1,14 @@
 package com.microapp.autumn.api.config;
 
-import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 @Setter
 @Getter
-@EqualsAndHashCode(of = {"name", "ip", "port"})
+@ToString
 public class ConsumerConfig {
     /**
      * reference service name

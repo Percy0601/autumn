@@ -56,9 +56,9 @@ public class TrainingProviderTest {
         Integer port = 30880;
 
         SpiUtil.discovery();
-        Boolean result = MulticastDiscovery.provider().checkHealth(ip, port);
+//        Boolean result = MulticastDiscovery.provider().checkHealth(ip, port);
 
-        log.info("===========check health result: {}", result);
+//        log.info("===========check health result: {}", result);
     }
 
     @Test

@@ -40,14 +40,14 @@ public class MulticastDiscoveryTest {
 
         while (true) {
             Set<String> services = discovery.services();
-            log.info("discovery:{}", discovery.services());
+            log.info("======================begin discovery:{}, ======================", discovery.services());
             services.forEach(it -> {
                 List<ConsumerConfig> consumers = discovery.getInstances(it);
                 log.info("service:{}, consumers:{}", it, consumers);
             });
-
+            log.info("======================end discovery======================");
             try {
-                Thread.sleep(3000);
+                Thread.sleep(5000);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
