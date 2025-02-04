@@ -6,10 +6,12 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Properties;
 
 import com.microapp.autumn.api.Registry;
 import com.microapp.autumn.api.config.ApplicationConfig;
 import com.microapp.autumn.api.config.ProviderConfig;
+import com.microapp.autumn.api.util.CommonUtil;
 import com.microapp.autumn.api.util.ConverterUtil;
 
 import lombok.extern.slf4j.Slf4j;
@@ -89,7 +91,10 @@ public class MulticastRegistry implements Registry {
 
     private void registry(MulticastSocket ms, InetAddress group, Integer port) {
         ProviderConfig config = ProviderConfig.getInstance();
+        Properties properties = CommonUtil.readClasspath("application.properties");
+        config.init(properties);
         String registryRequest = ConverterUtil.registryRequest(config);
+        log.info("autumn multicast registry, ip:{}, port:{}, config:{}", group.getHostAddress(), port, config.toString());
         try {
             ms.joinGroup(group);
             byte[] buffer = registryRequest.getBytes();
