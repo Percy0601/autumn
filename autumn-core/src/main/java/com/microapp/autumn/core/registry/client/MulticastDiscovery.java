@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -33,7 +34,7 @@ public class MulticastDiscovery implements Discovery {
     private static volatile MulticastDiscovery instance;
     private AtomicBoolean initStatus = new AtomicBoolean(false);
     private MulticastSocket mc;
-    private ConcurrentSkipListSet<ConsumerConfig> instances = new ConcurrentSkipListSet();
+    private ConcurrentHashMap<String, ConsumerConfig> instances = new ConcurrentHashMap();
 
     public static MulticastDiscovery provider() {
         if(Objects.isNull(instance)) {
@@ -57,6 +58,7 @@ public class MulticastDiscovery implements Discovery {
         try {
             mc = new MulticastSocket(port);
             InetAddress group = InetAddress.getByName(ip);
+            log.info("autumn multicast discovery, ip:{}, port:{}", ip, port);
             discovery(mc, group, port);
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -64,10 +66,14 @@ public class MulticastDiscovery implements Discovery {
     }
 
     private void addInstance(ConsumerConfig consumerConfig) {
-        if(instances.contains(consumerConfig)) {
+        String hash = consumerConfig.getName().concat(":")
+                .concat(consumerConfig.getIp())
+                .concat(":")
+                .concat(consumerConfig.getPort().toString());
+        if(instances.contains(hash)) {
             return;
         }
-        instances.add(consumerConfig);
+        instances.put(hash, consumerConfig);
     }
 
     private void removeInstance(ConsumerConfig consumerConfig) {
@@ -108,7 +114,6 @@ public class MulticastDiscovery implements Discovery {
                     DatagramPacket sendPacket = new DatagramPacket(sendBuff, sendBuff.length, group, port);
                     mc.send(sendPacket);
                     Arrays.fill(sendBuff, (byte) 0);
-                    return;
                 }
 
                 if(ConverterUtil.MULTICAST_SHUTDOWN_REQUEST.equals(params.get(ConverterUtil.CONSTANT_URL_PATH))) {
@@ -143,13 +148,15 @@ public class MulticastDiscovery implements Discovery {
 
     @Override
     public Set<String> services() {
-        Set<String> services = instances.stream().map(ConsumerConfig::getName).collect(Collectors.toSet());
+        Set<String> services = instances.values().stream()
+                .map(ConsumerConfig::getName)
+                .collect(Collectors.toSet());
         return services;
     }
 
     @Override
     public List<ConsumerConfig> getInstances(String name) {
-        Map<String, List<ConsumerConfig>> result = instances.stream()
+        Map<String, List<ConsumerConfig>> result = instances.values().stream()
                 .collect(Collectors.groupingBy(ConsumerConfig::getName));
         return result.get(name);
     }
