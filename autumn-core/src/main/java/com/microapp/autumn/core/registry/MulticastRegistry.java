@@ -7,6 +7,7 @@ import java.net.MulticastSocket;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicLong;
 
 import com.microapp.autumn.api.Registry;
 import com.microapp.autumn.api.config.ApplicationConfig;
@@ -23,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MulticastRegistry implements Registry {
     private static volatile MulticastRegistry instance;
-
+    private volatile AtomicLong latest = new AtomicLong(System.currentTimeMillis());
     public static MulticastRegistry provider() {
         if(Objects.isNull(instance)) {
             synchronized (MulticastRegistry.class) {
@@ -38,6 +39,10 @@ public class MulticastRegistry implements Registry {
 
     @Override
     public Boolean register() {
+        if((latest.get() + 10 * 1000) > System.currentTimeMillis()) {
+            return false;
+        }
+        latest.set(System.currentTimeMillis());
         log.info("autumn-multicast register init");
         return init();
     }

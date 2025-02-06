@@ -87,13 +87,11 @@ public class ConcurrentBag implements AutoCloseable {
         List<ConsumerConfig> instances = discovery.getInstances(config.getName());
         config.setInstances(instances);
         List<ConsumerConfig> consumerConfigs = config.getInstances();
-        mayScale.set(false);
-        Boolean nextScale = false;
 
         if(Objects.isNull(consumerConfigs)) {
             return false;
         }
-
+        mayScale.set(false);
         for(ConsumerConfig consumerConfig: consumerConfigs) {
             AtomicInteger active = consumerConfig.getActive();
             if(Objects.isNull(active)) {
@@ -109,15 +107,15 @@ public class ConcurrentBag implements AutoCloseable {
             if(active.get() >= consumerConfig.getConnections().intValue()) {
                 continue;
             }
-            nextScale = true;
+
             ConcurrentBagEntry entry = converter(consumerConfig);
             if(Objects.isNull(entry)) {
                 continue;
             }
             add(entry);
         }
-        mayScale.set(nextScale);
-        return nextScale;
+        mayScale.set(true);
+        return true;
     }
 
     private ConcurrentBagEntry converter(ConsumerConfig consumerConfig) {

@@ -6,8 +6,6 @@ import com.microapp.autumn.api.Registry;
 import com.microapp.autumn.api.config.ApplicationConfig;
 import com.microapp.autumn.api.config.ServiceConfig;
 import com.microapp.autumn.api.util.SpiUtil;
-import com.microapp.autumn.api.util.ThreadUtil;
-import com.microapp.autumn.core.registry.MulticastRegistry;
 import com.microapp.autumn.core.server.AutumnProvider;
 
 import lombok.Getter;
@@ -50,12 +48,6 @@ public class AutumnBootstrap {
 
         Registry registry = SpiUtil.registry();
         registry.register();
-        if(registry instanceof MulticastRegistry) {
-            Runnable runnable = () -> {
-                registry.register();
-            };
-            ThreadUtil.getInstance().scheduleWithFixedDelay(runnable, 10L);
-        }
         log.info("autumn registry finish");
 
         SpiUtil.discovery().discovery();

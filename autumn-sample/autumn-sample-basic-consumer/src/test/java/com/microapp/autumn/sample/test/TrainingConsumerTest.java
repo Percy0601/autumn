@@ -14,10 +14,13 @@ import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.junit.jupiter.api.Test;
 
+import com.microapp.autumn.api.Registry;
 import com.microapp.autumn.api.config.ReferenceConfig;
 import com.microapp.autumn.api.enums.RegistryTypeEnum;
+import com.microapp.autumn.api.util.SpiUtil;
 import com.microapp.autumn.core.pool.AutumnPool;
 import com.microapp.autumn.core.pool.impl.ConcurrentBagEntry;
+import com.microapp.autumn.core.registry.client.MulticastDiscovery;
 import com.microapp.autumn.core.server.AutumnConsumer;
 import com.microapp.autumn.sample.api.SomeService;
 import com.microapp.autumn.sample.api.User;
@@ -33,10 +36,7 @@ public class TrainingConsumerTest {
 
     @Test
     void testConsumer() {
-//        String ip = "192.168.1.14";
-//        Integer port = 30880;
-//        Boolean result = MulticastDiscovery.provider().checkHealth(ip, port);
-//        log.info("===========check health result: {}", result);
+        SpiUtil.discovery().discovery();
         AutumnConsumer consumer = AutumnConsumer.provider();
         ReferenceConfig<SomeService.Client> referenceConfig = new ReferenceConfig<>();
         referenceConfig.setName("training-a");
@@ -44,11 +44,25 @@ public class TrainingConsumerTest {
         referenceConfig.setPoolTimeout(10000L);
         referenceConfig.setRegistryTypeEnum(RegistryTypeEnum.MULTICAST);
         referenceConfig.setSocketTimeout(3000L);
-
         consumer.reference(referenceConfig);
 
         ConcurrentBagEntry entry = AutumnPool.getInstance().borrow(referenceConfig.getName());
-
+        if(Objects.isNull(entry)) {
+            for (int i = 0; i < 10; i++) {
+                log.info("===========registry: {}", i);
+                Registry registry = SpiUtil.registry();
+                registry.register();
+                entry = AutumnPool.getInstance().borrow(referenceConfig.getName());
+                if(Objects.nonNull(entry)) {
+                    break;
+                }
+                try {
+                    Thread.sleep(3000L);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
 
         TTransport transport = entry.getEntry();
         TProtocol protocol = new TBinaryProtocol(transport);
