@@ -44,22 +44,11 @@ public class TrainingConsumerTest {
         referenceConfig.setPoolTimeout(10000L);
         referenceConfig.setRegistryTypeEnum(RegistryTypeEnum.MULTICAST);
         referenceConfig.setSocketTimeout(3000L);
+
         consumer.reference(referenceConfig);
 
         ConcurrentBagEntry entry = AutumnPool.getInstance().borrow(referenceConfig.getName());
-        if(Objects.isNull(entry)) {
-            for(int i = 0; i < 10; i++) {
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                entry = AutumnPool.getInstance().borrow(referenceConfig.getName());
-                if(Objects.nonNull(entry)) {
-                    break;
-                }
-            }
-        }
+
 
         TTransport transport = entry.getEntry();
         TProtocol protocol = new TBinaryProtocol(transport);

@@ -36,6 +36,7 @@ public class ConcurrentBag implements AutoCloseable {
     private final AtomicInteger waiters = new AtomicInteger(0);
     private final Map<String, ConcurrentBagEntry> mapping = new ConcurrentHashMap<>();
     private final AtomicBoolean mayScale = new AtomicBoolean(true);
+
     private int maxWaiters;
     private ReferenceConfig<? extends TServiceClient> config;
 

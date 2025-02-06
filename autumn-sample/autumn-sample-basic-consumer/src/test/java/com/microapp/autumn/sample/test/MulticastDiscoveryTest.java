@@ -61,7 +61,11 @@ public class MulticastDiscoveryTest {
         Registry registry = SpiUtil.registry();
         registry.register();
 
-
+        try {
+            System.in.read();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Test
