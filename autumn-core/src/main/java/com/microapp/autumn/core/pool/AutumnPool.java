@@ -1,5 +1,6 @@
 package com.microapp.autumn.core.pool;
 
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -63,6 +64,9 @@ public final class AutumnPool {
     }
 
     public void requite(ConcurrentBagEntry entry) {
+        if(Objects.isNull(entry)) {
+            return;
+        }
         ConcurrentBag bag = mapping.get(entry.getService());
         bag.requite(entry);
     }

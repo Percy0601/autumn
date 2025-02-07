@@ -7,7 +7,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.thrift.TServiceClient;
@@ -35,7 +34,6 @@ public class ConcurrentBag implements AutoCloseable {
     private final SynchronousQueue<ConcurrentBagEntry> handoffQueue = new SynchronousQueue<>(true);
     private final AtomicInteger waiters = new AtomicInteger(0);
     private final Map<String, ConcurrentBagEntry> mapping = new ConcurrentHashMap<>();
-    private final AtomicBoolean mayScale = new AtomicBoolean(true);
 
     private int maxWaiters;
     private ReferenceConfig<? extends TServiceClient> config;
@@ -59,20 +57,17 @@ public class ConcurrentBag implements AutoCloseable {
         if(waiting >= maxWaiters) {
             throw new AutumnException("autumn pool waiters over max!");
         }
+        scale();
         waiters.incrementAndGet();
-        if(mayScale.get()) {
-            scale();
-        }
-
         try {
-            timeout = timeUnit.toNanos(timeout);
             do {
-                final long start = currentTime();
+                final long start = System.currentTimeMillis();
                 final ConcurrentBagEntry bagEntry = handoffQueue.poll(timeout, NANOSECONDS);
-                if (bagEntry == null || bagEntry.compareAndSet(ConcurrentBagEntry.STATE_NOT_IN_USE, ConcurrentBagEntry.STATE_IN_USE)) {
+                if (bagEntry != null && bagEntry.compareAndSet(ConcurrentBagEntry.STATE_NOT_IN_USE, ConcurrentBagEntry.STATE_IN_USE)) {
                     return bagEntry;
                 }
-                timeout -= elapsedNanos(start);
+                final long end = System.currentTimeMillis();
+                timeout -= (end - start);
             } while (timeout > 0);
 
             return null;
@@ -86,12 +81,11 @@ public class ConcurrentBag implements AutoCloseable {
         discovery.discovery();
         List<ConsumerConfig> instances = discovery.getInstances(config.getName());
         config.setInstances(instances);
-        List<ConsumerConfig> consumerConfigs = config.getInstances();
 
+        List<ConsumerConfig> consumerConfigs = config.getInstances();
         if(Objects.isNull(consumerConfigs)) {
             return false;
         }
-        mayScale.set(false);
         for(ConsumerConfig consumerConfig: consumerConfigs) {
             AtomicInteger active = consumerConfig.getActive();
             if(Objects.isNull(active)) {
@@ -114,7 +108,6 @@ public class ConcurrentBag implements AutoCloseable {
             }
             add(entry);
         }
-        mayScale.set(true);
         return true;
     }
 
@@ -159,11 +152,15 @@ public class ConcurrentBag implements AutoCloseable {
 
     public void add(ConcurrentBagEntry entry) {
         mapping.put(entry.getId(), entry);
-        // spin until a thread takes it or none are waiting
-        while (waiters.get() > 0 &&
-                entry.getState() == ConcurrentBagEntry.STATE_NOT_IN_USE &&
-                !handoffQueue.offer(entry)) {
+        long timeout = 100;
+        while (waiters.get() > 0 && !handoffQueue.offer(entry)) {
+            final long start = System.currentTimeMillis();
             Thread.yield();
+            final long end = System.currentTimeMillis();
+            timeout -= (end - start);
+            if(timeout < 0) {
+                break;
+            }
         }
         sharedList.add(entry);
     }
@@ -184,14 +181,6 @@ public class ConcurrentBag implements AutoCloseable {
         sharedList.clear();
         handoffQueue.clear();
         waiters.set(0);
-    }
-
-    private long elapsedNanos(final long startTime) {
-        return System.nanoTime() - startTime;
-    }
-
-    private long currentTime() {
-        return System.nanoTime();
     }
 
     public void remove(ConcurrentBagEntry entry) {

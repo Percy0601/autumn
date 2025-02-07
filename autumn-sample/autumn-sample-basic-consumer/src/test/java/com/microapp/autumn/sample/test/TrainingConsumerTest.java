@@ -1,6 +1,14 @@
 package com.microapp.autumn.sample.test;
 
+import java.io.IOException;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
@@ -18,6 +26,7 @@ import com.microapp.autumn.api.Registry;
 import com.microapp.autumn.api.config.ReferenceConfig;
 import com.microapp.autumn.api.enums.RegistryTypeEnum;
 import com.microapp.autumn.api.util.SpiUtil;
+import com.microapp.autumn.api.util.ThreadUtil;
 import com.microapp.autumn.core.pool.AutumnPool;
 import com.microapp.autumn.core.pool.impl.ConcurrentBagEntry;
 import com.microapp.autumn.core.registry.client.MulticastDiscovery;
@@ -63,17 +72,54 @@ public class TrainingConsumerTest {
                 }
             }
         }
+        AutumnPool.getInstance().requite(entry);
 
-        TTransport transport = entry.getEntry();
-        TProtocol protocol = new TBinaryProtocol(transport);
-        TMultiplexedProtocol multiplexedProtocol = new TMultiplexedProtocol(protocol, SomeService.Iface.class.getName());
-        SomeService.Iface client = new SomeService.Client(multiplexedProtocol);
-        try {
-            String echoResult = client.echo("1111");
-            log.info("===========echoResult result: {}", echoResult);
-        } catch (TException e) {
-            throw new RuntimeException(e);
-        }
+//        AtomicInteger total = new AtomicInteger(0);
+//        Runnable r = () -> {
+//            for(; total.get() < 10000; total.incrementAndGet()) {
+//                ConcurrentBagEntry ce = null;
+//                try {
+//                    if(ce == null) {
+//                        continue;
+//                    }
+//                    ce = AutumnPool.getInstance().borrow(referenceConfig.getName());
+//                    String msg = UUID.randomUUID().toString();
+//                    TTransport transport = ce.getEntry();
+//                    TProtocol protocol = new TBinaryProtocol(transport);
+//                    TMultiplexedProtocol multiplexedProtocol = new TMultiplexedProtocol(protocol, SomeService.Iface.class.getName());
+//                    SomeService.Iface client = new SomeService.Client(multiplexedProtocol);
+//
+//                    String echoResult = client.echo(msg);
+//                    if(!echoResult.equals("Hello, ".concat(msg))) {
+//                        log.info("===========echoResult result: {}", echoResult);
+//                    } else {
+//                        log.info("===========echoResult success: {}", ce.getId());
+//                    }
+//                } catch (TException e) {
+//                    log.warn("===========echoResult exception: {}", e.getMessage());
+//                } finally {
+//                    log.info("===========echoResult final: {}", total.get());
+//                    AutumnPool.getInstance().requite(ce);
+//                }
+//            }
+//        };
+//
+////        ExecutorService es = Executors.newFixedThreadPool(10);
+////        es.submit(r);
+////        for(int i = 0; i < 10000; i++) {
+////            es.submit(r);
+////        }
+//
+//        for(int i = 0; i < 10; i++) {
+//            Thread t = new Thread(r, "t-" + i);
+//            t.start();
+//        }
+//
+//        try {
+//            System.in.read();
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
 
     }
 
@@ -100,6 +146,54 @@ public class TrainingConsumerTest {
         } catch (TException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Test
+    void test() {
+        long timeout = 1;
+        TimeUnit timeUnit = TimeUnit.MILLISECONDS;
+        timeout = timeUnit.toMillis(timeout);
+        log.info("=====================, 1");
+        long current = currentTime();
+        while (true) {
+            Thread.yield();
+            timeout -= elapsedNanos(currentTime());
+            if(timeout < 0) {
+                break;
+            }
+        }
+        log.info("=====================, 2");
+    }
+
+    private long elapsedNanos(final long startTime) {
+        return System.currentTimeMillis() - startTime;
+    }
+
+    private long currentTime() {
+        return System.currentTimeMillis();
+    }
+
+    @Test
+    void test2() {
+        SynchronousQueue<String> handoffQueue = new SynchronousQueue<>(true);
+
+        for(int i = 0; i < 10; i++) {
+            String c = UUID.randomUUID().toString();
+            boolean r = false;
+            try {
+                handoffQueue.put(c);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            log.info("save content:{}, result:{}", c, r);
+        }
+
+        for(int i = 0; i < 10; i++) {
+            String result = handoffQueue.poll();
+            log.info("==========:{}", result);
+        }
+
+
     }
 
 
