@@ -56,10 +56,10 @@ public class ThreadUtil {
                     Integer minThreads = providerConfig.getMinThreads();
                     Integer maxThreads = providerConfig.getMaxThreads();
                     Integer workerKeepAliveTime = providerConfig.getWorkerKeepAliveTime();
-                    workerExecutor = new ThreadPoolExecutor(minThreads,
-                            maxThreads,
-                            workerKeepAliveTime,
-                            TimeUnit.SECONDS,
+                    workerExecutor = new ThreadPoolExecutor(1,
+                            300,
+                            5,
+                            TimeUnit.MINUTES,
                             new SynchronousQueue<Runnable>(),
                             new ThreadFactoryWithGarbageCleanup(THREAD_POOL_NAME_WORKER));
                 }
