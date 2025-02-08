@@ -49,7 +49,13 @@ public class ConcurrentBag implements AutoCloseable {
 
     public ConcurrentBagEntry borrow(long timeout, final TimeUnit timeUnit) throws InterruptedException {
         ConcurrentBagEntry entry = sharedList.poll();
-        if(null != entry) {
+        if(null != entry && entry.getState() == ConcurrentBagEntry.STATE_NOT_IN_USE) {
+            entry.compareAndSet(ConcurrentBagEntry.STATE_NOT_IN_USE, ConcurrentBagEntry.STATE_IN_USE);
+            return entry;
+        }
+        scale();
+        entry = sharedList.poll();
+        if(null != entry && entry.getState() == ConcurrentBagEntry.STATE_NOT_IN_USE) {
             entry.compareAndSet(ConcurrentBagEntry.STATE_NOT_IN_USE, ConcurrentBagEntry.STATE_IN_USE);
             return entry;
         }
@@ -57,26 +63,27 @@ public class ConcurrentBag implements AutoCloseable {
         if(waiting >= maxWaiters) {
             throw new AutumnException("autumn pool waiters over max!");
         }
-        scale();
         waiters.incrementAndGet();
         try {
+            log.info("pool begin queue");
             do {
                 final long start = System.currentTimeMillis();
-                final ConcurrentBagEntry bagEntry = handoffQueue.poll(timeout, NANOSECONDS);
-                if (bagEntry != null && bagEntry.compareAndSet(ConcurrentBagEntry.STATE_NOT_IN_USE, ConcurrentBagEntry.STATE_IN_USE)) {
-                    return bagEntry;
+                entry = handoffQueue.poll(timeout, NANOSECONDS);
+                if (entry != null && entry.getState() == ConcurrentBagEntry.STATE_NOT_IN_USE) {
+                    entry.compareAndSet(ConcurrentBagEntry.STATE_NOT_IN_USE, ConcurrentBagEntry.STATE_IN_USE);
+                    return entry;
                 }
                 final long end = System.currentTimeMillis();
                 timeout -= (end - start);
             } while (timeout > 0);
-
+            log.info("pool end queue, entry null");
             return null;
         } finally {
             waiters.decrementAndGet();
         }
     }
 
-    private Boolean scale() {
+    private synchronized Boolean scale() {
         Discovery discovery = SpiUtil.discovery();
         discovery.discovery();
         List<ConsumerConfig> instances = discovery.getInstances(config.getName());
@@ -98,8 +105,8 @@ public class ConcurrentBag implements AutoCloseable {
                 consumerConfig.setConnections(10);
             }
 
-            if(active.get() >= consumerConfig.getConnections().intValue()) {
-                continue;
+            if(active.get() >= 500) {
+                break;
             }
 
             ConcurrentBagEntry entry = converter(consumerConfig);
@@ -123,11 +130,15 @@ public class ConcurrentBag implements AutoCloseable {
             transport = new TFramedTransport(tsocket);
             transport.open();
             ConcurrentBagEntry entry = new ConcurrentBagEntryImpl<>(name, ip, port, transport);
+            entry.setState(ConcurrentBagEntry.STATE_NOT_IN_USE);
             return entry;
         } catch (TTransportException e) {
             log.warn("scale thrift connection fail, error:", e);
+            return null;
+        } catch (Exception e) {
+            log.warn("scale thrift connection open fail, entry null!");
+            return null;
         }
-        return null;
     }
 
     public void requite(final ConcurrentBagEntry bagEntry){
@@ -136,26 +147,31 @@ public class ConcurrentBag implements AutoCloseable {
             bagEntry.close();
             return;
         }
-        bagEntry.setState(ConcurrentBagEntry.STATE_NOT_IN_USE);
 
+        long timeout = 500L;
         for (int i = 0; waiters.get() > 0; i++) {
-            if (bagEntry.getState() != ConcurrentBagEntry.STATE_NOT_IN_USE || handoffQueue.offer(bagEntry)) {
+            if (handoffQueue.offer(bagEntry)) {
+                bagEntry.setState(ConcurrentBagEntry.STATE_NOT_IN_USE);
                 return;
-            } else if ((i & 0xff) == 0xff) {
-                parkNanos(MICROSECONDS.toNanos(10));
-            } else {
-                Thread.yield();
+            }
+            final long start = System.currentTimeMillis();
+            parkNanos(MICROSECONDS.toNanos(100));
+            final long end = System.currentTimeMillis();
+            timeout -= (end - start);
+            if(timeout < 0) {
+                break;
             }
         }
+        bagEntry.setState(ConcurrentBagEntry.STATE_NOT_IN_USE);
         sharedList.offer(bagEntry);
     }
 
     public void add(ConcurrentBagEntry entry) {
         mapping.put(entry.getId(), entry);
-        long timeout = 100;
+        long timeout = 500;
         while (waiters.get() > 0 && !handoffQueue.offer(entry)) {
             final long start = System.currentTimeMillis();
-            Thread.yield();
+            parkNanos(MICROSECONDS.toNanos(100));
             final long end = System.currentTimeMillis();
             timeout -= (end - start);
             if(timeout < 0) {

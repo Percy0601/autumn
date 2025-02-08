@@ -74,53 +74,44 @@ public class TrainingConsumerTest {
         }
         AutumnPool.getInstance().requite(entry);
 
-        AtomicInteger total = new AtomicInteger(0);
         Runnable r = () -> {
-            for(; total.get() < 10000; total.incrementAndGet()) {
-                ConcurrentBagEntry ce = null;
-                try {
-                    if(ce == null) {
-                        continue;
-                    }
-                    ce = AutumnPool.getInstance().borrow(referenceConfig.getName());
-                    String msg = UUID.randomUUID().toString();
-                    TTransport transport = ce.getEntry();
-                    TProtocol protocol = new TBinaryProtocol(transport);
-                    TMultiplexedProtocol multiplexedProtocol = new TMultiplexedProtocol(protocol, SomeService.Iface.class.getName());
-                    SomeService.Iface client = new SomeService.Client(multiplexedProtocol);
+            ConcurrentBagEntry ce = null;
+            try {
+                ce = AutumnPool.getInstance().borrow(referenceConfig.getName());
+                String msg = UUID.randomUUID().toString();
+                TTransport transport = ce.getEntry();
+                TProtocol protocol = new TBinaryProtocol(transport);
+                TMultiplexedProtocol multiplexedProtocol = new TMultiplexedProtocol(protocol, SomeService.Iface.class.getName());
+                SomeService.Iface client = new SomeService.Client(multiplexedProtocol);
 
-                    String echoResult = client.echo(msg);
-                    if(!echoResult.equals("Hello, ".concat(msg))) {
-                        log.info("===========echoResult result: {}", echoResult);
-                    } else {
-                        log.info("===========echoResult success: {}", ce.getId());
-                    }
-                } catch (TException e) {
-                    log.warn("===========echoResult exception: {}", e.getMessage());
-                } finally {
-                    log.info("===========echoResult final: {}", total.get());
-                    AutumnPool.getInstance().requite(ce);
+                String echoResult = client.echo(msg);
+                if(!echoResult.equals("Hello, ".concat(msg))) {
+                    log.info("===========echoResult fail: {}", echoResult);
+                } else {
+                    // log.info("===========echoResult success: {}, content:{}", ce.getId(), echoResult);
                 }
+            } catch (TException e) {
+                log.warn("===========echoResult exception: {}, id:{}, state:{}", e.getMessage(), ce.getId(), ce.getState());
+            } finally {
+                AutumnPool.getInstance().requite(ce);
             }
         };
 
-//        ExecutorService es = Executors.newFixedThreadPool(10);
-//        es.submit(r);
-//        for(int i = 0; i < 10000; i++) {
-//            es.submit(r);
-//        }
+        ExecutorService es = Executors.newFixedThreadPool(10);
+        int i = 0;
+        for(; i < 10000; i++) {
+             es.submit(r);
+             if(i % 2000 == 0) {
+                 try {
+                     Thread.sleep(100L);
+                 } catch (InterruptedException e) {
+                     throw new RuntimeException(e);
+                 }
+             }
 
-        for(int i = 0; i < 10; i++) {
-            Thread t = new Thread(r, "t-" + i);
-            t.start();
         }
 
-        try {
-            System.in.read();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
+        log.info("execute over~{}", i);
     }
 
     @Test

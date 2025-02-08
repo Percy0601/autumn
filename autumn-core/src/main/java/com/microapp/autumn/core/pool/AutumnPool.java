@@ -56,7 +56,7 @@ public final class AutumnPool {
     public ConcurrentBagEntry borrow(String service) {
         ConcurrentBag bag = mapping.get(service);
         try {
-            ConcurrentBagEntry entry = bag.borrow(1, TimeUnit.SECONDS);
+            ConcurrentBagEntry entry = bag.borrow(1000, TimeUnit.MILLISECONDS);
             return entry;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
