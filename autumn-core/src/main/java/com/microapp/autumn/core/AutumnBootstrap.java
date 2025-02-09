@@ -47,11 +47,11 @@ public class AutumnBootstrap {
         provider.start();
         log.info("autumn provider finish");
 
-        Registry registry = SpiUtil.load(Registry.class);
+        Registry registry = SpiUtil.registry();
         registry.register();
         log.info("autumn registry finish");
 
-        SpiUtil.load(Discovery.class).discovery();
+        SpiUtil.discovery().discovery();
         shutdownHook();
     }
 
