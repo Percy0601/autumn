@@ -99,6 +99,7 @@ public class MulticastRegistry implements Registry {
         config.init(properties);
         log.info("autumn-multicast registry ip:{}, port:{}, config:{}", ip, port, config);
         Runnable runnable = () -> {
+            log.info("autumn-multicast registry ip:{}, port:{}, config:{}", ip, port, config);
             try {
                 InetAddress group = InetAddress.getByName(ip);
                 MulticastSocket mcs = new MulticastSocket(port);
