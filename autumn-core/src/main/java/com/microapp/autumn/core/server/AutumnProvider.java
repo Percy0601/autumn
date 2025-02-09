@@ -91,9 +91,9 @@ public class AutumnProvider {
                 tArgs.transportFactory(new TFramedTransport.Factory());
                 tArgs.protocolFactory(new TBinaryProtocol.Factory());
                 tArgs.executorService(executorService);
-                tArgs.acceptQueueSizePerThread(100);
-//                tArgs.stopTimeoutVal(3);
-//                tArgs.stopTimeoutUnit(TimeUnit.SECONDS);
+                tArgs.acceptQueueSizePerThread(1000);
+                tArgs.stopTimeoutVal(30);
+                tArgs.stopTimeoutUnit(TimeUnit.SECONDS);
                 tArgs.processor(processor);
 
                 ServiceConfig<ControlApi.Iface> controlApiService = new ServiceConfig();

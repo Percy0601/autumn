@@ -212,7 +212,7 @@ public class ConcurrentBag implements AutoCloseable {
                 handoffQueue.remove(it);
             }
         });
-        mapping.remove(entry);
+        mapping.remove(entry.getId());
     }
 
     public void remove(String ip) {

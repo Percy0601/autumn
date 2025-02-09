@@ -39,6 +39,7 @@ public class MulticastRegistry implements Registry {
 
     @Override
     public Boolean register() {
+        // avoid frequent registry
         if((latest.get() + 3 * 1000) > System.currentTimeMillis()) {
             return false;
         }

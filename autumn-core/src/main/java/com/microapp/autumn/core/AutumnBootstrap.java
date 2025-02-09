@@ -2,6 +2,7 @@ package com.microapp.autumn.core;
 
 import java.util.Objects;
 
+import com.microapp.autumn.api.Discovery;
 import com.microapp.autumn.api.Registry;
 import com.microapp.autumn.api.config.ApplicationConfig;
 import com.microapp.autumn.api.config.ServiceConfig;
@@ -46,11 +47,11 @@ public class AutumnBootstrap {
         provider.start();
         log.info("autumn provider finish");
 
-        Registry registry = SpiUtil.registry();
+        Registry registry = SpiUtil.load(Registry.class);
         registry.register();
         log.info("autumn registry finish");
 
-        SpiUtil.discovery().discovery();
+        SpiUtil.load(Discovery.class).discovery();
         shutdownHook();
     }
 

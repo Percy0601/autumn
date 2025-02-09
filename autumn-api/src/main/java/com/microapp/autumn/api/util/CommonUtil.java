@@ -23,6 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class CommonUtil {
+
+
     private static Map<String, Properties> mapping = null;
     private CommonUtil() {
 
