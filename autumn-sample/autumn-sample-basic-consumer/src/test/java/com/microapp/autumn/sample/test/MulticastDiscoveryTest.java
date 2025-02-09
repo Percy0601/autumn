@@ -37,7 +37,7 @@ public class MulticastDiscoveryTest {
     void testDiscovery() {
         Discovery discovery = SpiUtil.load(Discovery.class);
         discovery.discovery();
-
+        discovery.watch("training-a");
         while (true) {
             Set<String> services = discovery.services();
             log.info("======================begin discovery:{}, ======================", discovery.services());

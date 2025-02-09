@@ -9,6 +9,7 @@ import org.apache.thrift.TServiceClient;
 import com.microapp.autumn.api.Discovery;
 import com.microapp.autumn.api.config.ConsumerConfig;
 import com.microapp.autumn.api.config.ReferenceConfig;
+import com.microapp.autumn.api.util.ThreadUtil;
 import com.microapp.autumn.core.pool.AutumnPool;
 
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +20,6 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class ConsulDiscovery implements Discovery {
-
-
 
     private static volatile ConsulDiscovery instance;
 
@@ -38,6 +37,8 @@ public class ConsulDiscovery implements Discovery {
     @Override
     public void discovery() {
         log.info("begin discovery reference instances.");
+
+        // ThreadUtil.getInstance().scheduleWithFixedDelay();
     }
 
     @Override
@@ -58,6 +59,11 @@ public class ConsulDiscovery implements Discovery {
             return null;
         }
         return config.getInstances();
+    }
+
+    @Override
+    public void checkHealth() {
+
     }
 
 

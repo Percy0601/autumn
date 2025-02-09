@@ -176,5 +176,16 @@ public class MulticastDiscovery implements Discovery {
         return result.get(name);
     }
 
+    @Override
+    public void checkHealth() {
+        instances.forEach((k, v) -> {
+            ConsumerConfig instance = v;
+            if(System.currentTimeMillis() - instance.getLatestTime() > 10 * 1000) {
+                instances.remove(k);
+                AutumnPool.getInstance().leave(v);
+            }
+        });
+    }
+
 
 }

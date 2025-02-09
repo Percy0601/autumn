@@ -2,7 +2,9 @@ package com.microapp.autumn.core.server;
 
 import org.apache.thrift.TServiceClient;
 
+import com.microapp.autumn.api.Discovery;
 import com.microapp.autumn.api.config.ReferenceConfig;
+import com.microapp.autumn.api.util.SpiUtil;
 import com.microapp.autumn.core.pool.AutumnPool;
 import com.microapp.autumn.core.pool.impl.ConcurrentBagEntry;
 
@@ -27,6 +29,7 @@ public class AutumnConsumer {
 
     public <T extends TServiceClient> void reference(ReferenceConfig<T> referenceConfig) {
         AutumnPool.getInstance().referenceConfig(referenceConfig);
+        SpiUtil.load(Discovery.class).watch(referenceConfig.getName());
     }
 
     public static void requite(ConcurrentBagEntry bagEntry) {

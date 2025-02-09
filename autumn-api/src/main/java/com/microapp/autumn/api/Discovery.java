@@ -33,7 +33,17 @@ public interface Discovery {
      */
     Set<String> services();
 
-
+    /**
+     * get service instances
+     *
+     * @param name
+     * @return
+     */
     List<ConsumerConfig> getInstances(String name);
+
+    /**
+     * handle check watch service health
+     */
+    void checkHealth();
 
 }

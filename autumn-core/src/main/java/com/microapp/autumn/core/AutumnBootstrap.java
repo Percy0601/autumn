@@ -51,9 +51,14 @@ public class AutumnBootstrap {
         registry.register();
         log.info("autumn registry finish");
 
-        SpiUtil.load(Discovery.class).discovery();
+        Discovery discovery = SpiUtil.load(Discovery.class);
+        discovery.discovery();
+        discovery.checkHealth();
+
         shutdownHook();
     }
+
+
 
     private void shutdownHook() {
 
