@@ -7,6 +7,7 @@ import java.net.MulticastSocket;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.microapp.autumn.api.Registry;
@@ -14,6 +15,7 @@ import com.microapp.autumn.api.config.ApplicationConfig;
 import com.microapp.autumn.api.config.ProviderConfig;
 import com.microapp.autumn.api.util.CommonUtil;
 import com.microapp.autumn.api.util.ConverterUtil;
+import com.microapp.autumn.api.util.ThreadUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,8 +25,12 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class MulticastRegistry implements Registry {
+
+
     private static volatile MulticastRegistry instance;
     private volatile AtomicLong latest = new AtomicLong(System.currentTimeMillis());
+    private volatile AtomicBoolean state = new AtomicBoolean(false);
+
     public static MulticastRegistry provider() {
         if(Objects.isNull(instance)) {
             synchronized (MulticastRegistry.class) {
@@ -40,10 +46,14 @@ public class MulticastRegistry implements Registry {
     @Override
     public Boolean register() {
         // avoid frequent registry
-        if((latest.get() + 3 * 1000) > System.currentTimeMillis()) {
-            return false;
+//        if((latest.get() + 3 * 1000) > System.currentTimeMillis()) {
+//            return false;
+//        }
+//        latest.set(System.currentTimeMillis());
+        if(state.get()) {
+            return true;
         }
-        latest.set(System.currentTimeMillis());
+        state.compareAndSet(false, true);
         return init();
     }
 
@@ -83,23 +93,27 @@ public class MulticastRegistry implements Registry {
         ApplicationConfig applicationConfig = ApplicationConfig.getInstance();
         String ip = applicationConfig.getMulticastIp();
         Integer port = applicationConfig.getMulticastPort();
-        log.info("autumn-multicast registry ip:{}, port:{}", ip, port);
-        try {
-            InetAddress group = InetAddress.getByName(ip);
-            MulticastSocket mcs = new MulticastSocket(port);
-            registry(mcs, group, port);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return true;
-    }
 
-    private void registry(MulticastSocket ms, InetAddress group, Integer port) {
         ProviderConfig config = ProviderConfig.getInstance();
         Properties properties = CommonUtil.readClasspath("application.properties");
         config.init(properties);
+        log.info("autumn-multicast registry ip:{}, port:{}, config:{}", ip, port, config);
+        Runnable runnable = () -> {
+            try {
+                InetAddress group = InetAddress.getByName(ip);
+                MulticastSocket mcs = new MulticastSocket(port);
+                registry(mcs, group, port, config);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        ThreadUtil.getInstance().scheduleWithFixedDelay(runnable, 3L);
+        return true;
+    }
+
+    private void registry(MulticastSocket ms, InetAddress group, Integer port, ProviderConfig config) {
         String registryRequest = ConverterUtil.registryRequest(config);
-        log.info("autumn multicast registry, ip:{}, port:{}, config:{}", group.getHostAddress(), port, config.toString());
         try {
             ms.joinGroup(group);
             byte[] buffer = registryRequest.getBytes();

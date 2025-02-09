@@ -16,7 +16,6 @@ import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.layered.TFramedTransport;
 
 import com.microapp.autumn.api.Discovery;
-import com.microapp.autumn.api.Registry;
 import com.microapp.autumn.api.config.ConsumerConfig;
 import com.microapp.autumn.api.config.ReferenceConfig;
 import com.microapp.autumn.api.util.AutumnException;

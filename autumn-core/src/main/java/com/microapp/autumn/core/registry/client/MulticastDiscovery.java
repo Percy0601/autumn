@@ -5,7 +5,6 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -16,12 +15,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import com.microapp.autumn.api.Discovery;
-import com.microapp.autumn.api.Registry;
 import com.microapp.autumn.api.config.ApplicationConfig;
 import com.microapp.autumn.api.config.ConsumerConfig;
 import com.microapp.autumn.api.enums.MulticastEventEnum;
 import com.microapp.autumn.api.util.ConverterUtil;
-import com.microapp.autumn.api.util.SpiUtil;
 import com.microapp.autumn.core.pool.AutumnPool;
 
 import lombok.Getter;
@@ -94,9 +91,7 @@ public class MulticastDiscovery implements Discovery {
             instance.setLatestTime(System.currentTimeMillis());
             return;
         }
-
-        SpiUtil.load(Registry.class).register();
-
+        log.info("multicast discovery receive data, config:{}", consumerConfig);
         consumerConfig.setLatestTime(System.currentTimeMillis());
         consumerConfig.setVersion(1);
         instances.put(hash, consumerConfig);
@@ -156,7 +151,6 @@ public class MulticastDiscovery implements Discovery {
     }
 
     private void receive(String ip, String data, MulticastEventEnum eventEnum) {
-        log.info("multicast discovery receive data, ip:{}, data:{}", ip, data);
         ConsumerConfig multicastConfig = ConverterUtil.queryStringToProvider(data);
         if(MulticastEventEnum.REGISTRY.equals(eventEnum)) {
             addInstance(multicastConfig);
