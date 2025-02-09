@@ -83,6 +83,9 @@ public final class AutumnPool {
 
     public void leave(ConsumerConfig consumerConfig) {
         ConcurrentBag bag = mapping.get(consumerConfig.getName());
+        if(Objects.isNull(bag)) {
+            return;
+        }
         bag.remove(consumerConfig.getIp());
     }
 
