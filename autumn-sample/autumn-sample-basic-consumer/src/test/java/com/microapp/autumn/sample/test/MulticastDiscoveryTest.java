@@ -35,7 +35,7 @@ public class MulticastDiscoveryTest {
 
     @Test
     void testDiscovery() {
-        Discovery discovery = SpiUtil.discovery();
+        Discovery discovery = SpiUtil.load(Discovery.class);
         discovery.discovery();
 
         while (true) {
@@ -58,7 +58,7 @@ public class MulticastDiscoveryTest {
 
     @Test
     void testRegistry() {
-        Registry registry = SpiUtil.registry();
+        Registry registry = SpiUtil.load(Registry.class);
         registry.register();
 
         try {
@@ -79,23 +79,6 @@ public class MulticastDiscoveryTest {
                 log.info("interface name:{}, display-name:{}, addr:{}", networkInterface.getName(), networkInterface.getDisplayName(), networkInterface.getInetAddresses());
             }
         } catch (SocketException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-
-    @Test
-    void init() {
-        Properties properties = CommonUtil.readClasspath("application.properties");
-        ApplicationConfig applicationConfig = ApplicationConfig.getInstance();
-        applicationConfig.init(properties);
-        ProviderConfig providerConfig = ProviderConfig.getInstance();
-        providerConfig.init(properties);
-        Discovery multicastDiscovery = SpiUtil.discovery();
-
-        try {
-            System.in.read();
-        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }

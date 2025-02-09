@@ -5,20 +5,24 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import com.microapp.autumn.api.Discovery;
+import com.microapp.autumn.api.Registry;
 import com.microapp.autumn.api.config.ApplicationConfig;
 import com.microapp.autumn.api.config.ConsumerConfig;
 import com.microapp.autumn.api.enums.MulticastEventEnum;
 import com.microapp.autumn.api.util.ConverterUtil;
 import com.microapp.autumn.api.util.SpiUtil;
+import com.microapp.autumn.core.pool.AutumnPool;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +38,7 @@ public class MulticastDiscovery implements Discovery {
     private AtomicBoolean initStatus = new AtomicBoolean(false);
     private MulticastSocket mc;
     private ConcurrentHashMap<String, ConsumerConfig> instances = new ConcurrentHashMap();
+    private Map<String, AtomicInteger> mapping = new ConcurrentHashMap<>();
 
     public static MulticastDiscovery provider() {
         if(Objects.isNull(instance)) {
@@ -64,14 +69,36 @@ public class MulticastDiscovery implements Discovery {
         }
     }
 
+    @Override
+    public void watch(String name) {
+        if(mapping.containsKey(name)) {
+            return;
+        }
+
+        mapping.put(name, new AtomicInteger(0));
+    }
+
     private void addInstance(ConsumerConfig consumerConfig) {
+        if(!mapping.containsKey(consumerConfig.getName())) {
+            return;
+        }
+
         String hash = consumerConfig.getName().concat(":")
                 .concat(consumerConfig.getIp())
                 .concat(":")
                 .concat(consumerConfig.getPort().toString());
         if(instances.contains(hash)) {
+            ConsumerConfig instance = instances.get(hash);
+            Integer version = instance.getVersion();
+            instance.setVersion(version);
+            instance.setLatestTime(System.currentTimeMillis());
             return;
         }
+
+        SpiUtil.load(Registry.class).register();
+
+        consumerConfig.setLatestTime(System.currentTimeMillis());
+        consumerConfig.setVersion(1);
         instances.put(hash, consumerConfig);
     }
 
@@ -84,10 +111,10 @@ public class MulticastDiscovery implements Discovery {
             handleDiscovery(ms, group, port);
         };
 
-        Thread thread = new Thread(runnable, "autumn-multicast-registry-receiver");
+        Thread thread = new Thread(runnable, "autumn-multicast-discovery");
         thread.setDaemon(true);
         thread.start();
-        log.info("autumn-multicast-registry begin listening");
+        log.info("autumn-multicast-discovery begin listening");
     }
 
     private void handleDiscovery(MulticastSocket ms, InetAddress group, Integer port) {
@@ -107,8 +134,6 @@ public class MulticastDiscovery implements Discovery {
                 Map<String, String> params = ConverterUtil.getUrlParams(data);
                 if(ConverterUtil.MULTICAST_REQUEST.equals(params.get(ConverterUtil.CONSTANT_URL_PATH))) {
                     receive(ip, data, MulticastEventEnum.REGISTRY);
-                    // response registry information
-                    SpiUtil.registry().register();
                 }
 
                 if(ConverterUtil.MULTICAST_SHUTDOWN_REQUEST.equals(params.get(ConverterUtil.CONSTANT_URL_PATH))) {
@@ -138,6 +163,7 @@ public class MulticastDiscovery implements Discovery {
             return;
         }
 
+        AutumnPool.getInstance().leave(multicastConfig);
         removeInstance(multicastConfig);
     }
 

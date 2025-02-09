@@ -19,6 +19,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class ConsulDiscovery implements Discovery {
+
+
+
     private static volatile ConsulDiscovery instance;
 
     public static ConsulDiscovery provider() {
@@ -35,6 +38,11 @@ public class ConsulDiscovery implements Discovery {
     @Override
     public void discovery() {
         log.info("begin discovery reference instances.");
+    }
+
+    @Override
+    public void watch(String name) {
+
     }
 
 

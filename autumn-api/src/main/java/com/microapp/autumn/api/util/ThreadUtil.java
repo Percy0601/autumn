@@ -3,6 +3,7 @@ package com.microapp.autumn.api.util;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
@@ -21,9 +22,12 @@ public class ThreadUtil {
     private ExecutorService workerExecutor;
     private ScheduledExecutorService scheduledExecutorService;
     private static final String THREAD_POOL_NAME_WORKER = "autumn-thread-pool";
-
     private ThreadUtil() {
 
+    }
+
+    public ExecutorService getSingleExecutorService() {
+        return scheduledExecutorService;
     }
 
     public static ThreadUtil getInstance() {
@@ -34,7 +38,22 @@ public class ThreadUtil {
                 }
             }
         }
+        instance.init();
         return instance;
+    }
+
+    private void init() {
+        if (Objects.isNull(scheduledExecutorService)) {
+            synchronized (this) {
+                if(Objects.isNull(scheduledExecutorService)) {
+                    scheduledExecutorService = Executors.newSingleThreadScheduledExecutor();
+                }
+            }
+        }
+    }
+
+    public void submit(Runnable runnable) {
+        scheduledExecutorService.submit(runnable);
     }
 
     public void scheduleWithFixedDelay(Runnable runnable, Long delay) {
@@ -45,7 +64,6 @@ public class ThreadUtil {
                 }
             }
         }
-
         scheduledExecutorService.scheduleWithFixedDelay(runnable, delay, delay, TimeUnit.SECONDS);
     }
 
@@ -60,9 +78,10 @@ public class ThreadUtil {
                             300,
                             5,
                             TimeUnit.MINUTES,
-                            new SynchronousQueue<Runnable>(),
+                            new LinkedBlockingQueue<>(10000),
                             new ThreadFactoryWithGarbageCleanup(THREAD_POOL_NAME_WORKER));
                 }
+
             }
         }
         return workerExecutor;

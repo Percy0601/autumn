@@ -44,7 +44,6 @@ public class MulticastRegistry implements Registry {
             return false;
         }
         latest.set(System.currentTimeMillis());
-        log.info("autumn-multicast register init");
         return init();
     }
 

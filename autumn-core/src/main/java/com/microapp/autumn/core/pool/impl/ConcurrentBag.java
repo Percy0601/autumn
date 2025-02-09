@@ -16,6 +16,7 @@ import org.apache.thrift.transport.TTransportException;
 import org.apache.thrift.transport.layered.TFramedTransport;
 
 import com.microapp.autumn.api.Discovery;
+import com.microapp.autumn.api.Registry;
 import com.microapp.autumn.api.config.ConsumerConfig;
 import com.microapp.autumn.api.config.ReferenceConfig;
 import com.microapp.autumn.api.util.AutumnException;
@@ -23,9 +24,7 @@ import com.microapp.autumn.api.util.SpiUtil;
 
 import lombok.extern.slf4j.Slf4j;
 
-import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
-import static java.util.concurrent.locks.LockSupport.parkNanos;
 
 @Slf4j
 public class ConcurrentBag implements AutoCloseable {
@@ -84,12 +83,8 @@ public class ConcurrentBag implements AutoCloseable {
     }
 
     private synchronized Boolean scale() {
-        Discovery discovery = SpiUtil.discovery();
-        discovery.discovery();
+        Discovery discovery = SpiUtil.load(Discovery.class);
         List<ConsumerConfig> instances = discovery.getInstances(config.getName());
-        if(Objects.isNull(instances) || instances.size() < 1) {
-            SpiUtil.registry().register();
-        }
         config.setInstances(instances);
         List<ConsumerConfig> consumerConfigs = config.getInstances();
         if(Objects.isNull(consumerConfigs)) {
@@ -157,7 +152,11 @@ public class ConcurrentBag implements AutoCloseable {
                 return;
             }
             final long start = System.currentTimeMillis();
-            parkNanos(MICROSECONDS.toNanos(100));
+            try {
+                Thread.sleep(10L);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             final long end = System.currentTimeMillis();
             timeout -= (end - start);
             if(timeout < 0) {
@@ -173,7 +172,11 @@ public class ConcurrentBag implements AutoCloseable {
         long timeout = 500;
         while (waiters.get() > 0 && !handoffQueue.offer(entry)) {
             final long start = System.currentTimeMillis();
-            parkNanos(MICROSECONDS.toNanos(100));
+            try {
+                Thread.sleep(10L);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             final long end = System.currentTimeMillis();
             timeout -= (end - start);
             if(timeout < 0) {

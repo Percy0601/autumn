@@ -47,18 +47,18 @@ public class AutumnBootstrap {
         provider.start();
         log.info("autumn provider finish");
 
-        Registry registry = SpiUtil.registry();
+        Registry registry = SpiUtil.load(Registry.class);
         registry.register();
         log.info("autumn registry finish");
 
-        SpiUtil.discovery().discovery();
+        SpiUtil.load(Discovery.class).discovery();
         shutdownHook();
     }
 
     private void shutdownHook() {
 
         Runnable shutdownHook = () -> {
-            SpiUtil.registry().shutdownHook();
+            SpiUtil.load(Registry.class).shutdownHook();
         };
         Runtime.getRuntime().addShutdownHook(new Thread(shutdownHook));
     }

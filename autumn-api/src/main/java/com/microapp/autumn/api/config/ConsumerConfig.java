@@ -38,4 +38,12 @@ public class ConsumerConfig {
      * check health fail count
      */
     private Integer checkFail;
+    /**
+     * get latest registry time
+     */
+    private Long latestTime;
+    /**
+     * registry version, less 3 version, delete this instance
+     */
+    private Integer version;
 }

@@ -1,14 +1,11 @@
 package com.microapp.autumn.sample.test;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.thrift.TDeserializer;
 import org.apache.thrift.TException;
@@ -22,14 +19,15 @@ import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.junit.jupiter.api.Test;
 
+import com.microapp.autumn.api.Discovery;
 import com.microapp.autumn.api.Registry;
+import com.microapp.autumn.api.config.ConsumerConfig;
 import com.microapp.autumn.api.config.ReferenceConfig;
 import com.microapp.autumn.api.enums.RegistryTypeEnum;
 import com.microapp.autumn.api.util.SpiUtil;
-import com.microapp.autumn.api.util.ThreadUtil;
+import com.microapp.autumn.core.AutumnBootstrap;
 import com.microapp.autumn.core.pool.AutumnPool;
 import com.microapp.autumn.core.pool.impl.ConcurrentBagEntry;
-import com.microapp.autumn.core.registry.client.MulticastDiscovery;
 import com.microapp.autumn.core.server.AutumnConsumer;
 import com.microapp.autumn.sample.api.SomeService;
 import com.microapp.autumn.sample.api.User;
@@ -45,7 +43,9 @@ public class TrainingConsumerTest {
 
     @Test
     void testConsumer() {
-        SpiUtil.discovery().discovery();
+
+        AutumnBootstrap.getInstance().serve();
+
         AutumnConsumer consumer = AutumnConsumer.provider();
         ReferenceConfig<SomeService.Client> referenceConfig = new ReferenceConfig<>();
         referenceConfig.setName("training-a");
@@ -54,25 +54,22 @@ public class TrainingConsumerTest {
         referenceConfig.setRegistryTypeEnum(RegistryTypeEnum.MULTICAST);
         referenceConfig.setSocketTimeout(3000L);
         consumer.reference(referenceConfig);
+        List<ConsumerConfig> instances = SpiUtil.load(Discovery.class).getInstances(referenceConfig.getName());
 
-        ConcurrentBagEntry entry = AutumnPool.getInstance().borrow(referenceConfig.getName());
-        if(Objects.isNull(entry)) {
-            for (int i = 0; i < 10; i++) {
-                log.info("===========registry: {}", i);
-                Registry registry = SpiUtil.registry();
-                registry.register();
-                entry = AutumnPool.getInstance().borrow(referenceConfig.getName());
-                if(Objects.nonNull(entry)) {
-                    break;
-                }
+        if(Objects.isNull(instances) || instances.size() < 1) {
+            for(int i = 0; i < 3; i++) {
                 try {
-                    Thread.sleep(3000L);
+                    Thread.sleep(2000L);
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
+                SpiUtil.load(Registry.class).register();
+                instances = SpiUtil.load(Discovery.class).getInstances(referenceConfig.getName());
+                if(Objects.nonNull(instances) && instances.size() > 1) {
+                    break;
+                }
             }
         }
-        AutumnPool.getInstance().requite(entry);
 
         Runnable r = () -> {
             ConcurrentBagEntry ce = null;
@@ -111,6 +108,11 @@ public class TrainingConsumerTest {
 
         }
 
+        try {
+            System.in.read();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         log.info("execute over~{}", i);
     }
 
@@ -137,54 +139,6 @@ public class TrainingConsumerTest {
         } catch (TException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    @Test
-    void test() {
-        long timeout = 1;
-        TimeUnit timeUnit = TimeUnit.MILLISECONDS;
-        timeout = timeUnit.toMillis(timeout);
-        log.info("=====================, 1");
-        long current = currentTime();
-        while (true) {
-            Thread.yield();
-            timeout -= elapsedNanos(currentTime());
-            if(timeout < 0) {
-                break;
-            }
-        }
-        log.info("=====================, 2");
-    }
-
-    private long elapsedNanos(final long startTime) {
-        return System.currentTimeMillis() - startTime;
-    }
-
-    private long currentTime() {
-        return System.currentTimeMillis();
-    }
-
-    @Test
-    void test2() {
-        SynchronousQueue<String> handoffQueue = new SynchronousQueue<>(true);
-
-        for(int i = 0; i < 10; i++) {
-            String c = UUID.randomUUID().toString();
-            boolean r = false;
-            try {
-                handoffQueue.put(c);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-            log.info("save content:{}, result:{}", c, r);
-        }
-
-        for(int i = 0; i < 10; i++) {
-            String result = handoffQueue.poll();
-            log.info("==========:{}", result);
-        }
-
-
     }
 
 
