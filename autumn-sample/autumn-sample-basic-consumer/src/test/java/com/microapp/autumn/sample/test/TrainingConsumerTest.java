@@ -88,7 +88,7 @@ public class TrainingConsumerTest {
                 if(!echoResult.equals("Hello, ".concat(msg))) {
                     log.info("===========echoResult fail: {}", echoResult);
                 } else {
-                    // log.info("===========echoResult success: {}, content:{}", ce.getId(), echoResult);
+                    log.info("===========echoResult success: {}, content:{}", ce.getId(), echoResult);
                 }
             } catch (TException e) {
                 log.warn("===========echoResult exception: {}, id:{}, state:{}", e.getMessage(), ce.getId(), ce.getState());

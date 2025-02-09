@@ -18,6 +18,7 @@ import com.microapp.autumn.api.config.ApplicationConfig;
 import com.microapp.autumn.api.config.ConsumerConfig;
 import com.microapp.autumn.api.enums.MulticastEventEnum;
 import com.microapp.autumn.api.util.ConverterUtil;
+import com.microapp.autumn.api.util.SpiUtil;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -106,6 +107,8 @@ public class MulticastDiscovery implements Discovery {
                 Map<String, String> params = ConverterUtil.getUrlParams(data);
                 if(ConverterUtil.MULTICAST_REQUEST.equals(params.get(ConverterUtil.CONSTANT_URL_PATH))) {
                     receive(ip, data, MulticastEventEnum.REGISTRY);
+                    // response registry information
+                    SpiUtil.registry().register();
                 }
 
                 if(ConverterUtil.MULTICAST_SHUTDOWN_REQUEST.equals(params.get(ConverterUtil.CONSTANT_URL_PATH))) {
