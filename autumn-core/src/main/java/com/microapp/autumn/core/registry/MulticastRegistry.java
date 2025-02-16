@@ -36,8 +36,8 @@ import lombok.extern.slf4j.Slf4j;
 public class MulticastRegistry implements Registry, Discovery {
     private static volatile MulticastRegistry instance;
     private volatile AtomicInteger count = new AtomicInteger(0);
-    private MulticastSocket mc;
-    private InetAddress group;
+    private volatile MulticastSocket mc;
+    private volatile InetAddress group;
     private ConcurrentHashMap<String, ConsumerConfig> instances = new ConcurrentHashMap();
     private Map<String, AtomicInteger> mapping = new ConcurrentHashMap<>();
 
@@ -61,9 +61,10 @@ public class MulticastRegistry implements Registry, Discovery {
             if(Objects.isNull(mc)) {
                 mc = new MulticastSocket(port);
                 group = InetAddress.getByName(ip);
+                mc.joinGroup(group);
             }
             Runnable runnable = () -> {
-                handleDiscovery(mc, group, port);
+                handleDiscovery(mc);
             };
 
             Thread thread = new Thread(runnable, "autumn-multicast-discovery");
@@ -75,9 +76,8 @@ public class MulticastRegistry implements Registry, Discovery {
         }
     }
 
-    private void handleDiscovery(MulticastSocket ms, InetAddress group, Integer port) {
+    private void handleDiscovery(MulticastSocket ms) {
         try {
-            ms.joinGroup(group);
             byte[] buffer = new byte[8192];
             DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
             while (!ms.isClosed()) {
@@ -247,8 +247,8 @@ public class MulticastRegistry implements Registry, Discovery {
                 String ip = applicationConfig.getMulticastIp();
                 mc = new MulticastSocket(port);
                 group = InetAddress.getByName(ip);
+                mc.joinGroup(group);
             }
-            mc.joinGroup(group);
             byte[] buffer = registryRequest.getBytes();
             DatagramPacket dp = new DatagramPacket(buffer, buffer.length, group, port);
             mc.send(dp);
