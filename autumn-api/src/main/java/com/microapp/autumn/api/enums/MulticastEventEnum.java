@@ -11,6 +11,7 @@ import lombok.Getter;
 @Getter
 public enum MulticastEventEnum {
     REGISTRY("registry", "multicast registry event"),
+    SUBSCRIBE("subscribe", "multicast subscribe event"),
     SHUTDOWN("shutdown", "multicast shutdown event"),
     ;
     private String code;

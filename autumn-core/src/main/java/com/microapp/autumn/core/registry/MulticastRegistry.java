@@ -5,17 +5,26 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
+import com.microapp.autumn.api.Discovery;
 import com.microapp.autumn.api.Registry;
 import com.microapp.autumn.api.config.ApplicationConfig;
+import com.microapp.autumn.api.config.ConsumerConfig;
 import com.microapp.autumn.api.config.ProviderConfig;
+import com.microapp.autumn.api.enums.MulticastEventEnum;
 import com.microapp.autumn.api.util.CommonUtil;
 import com.microapp.autumn.api.util.ConverterUtil;
-import com.microapp.autumn.api.util.ThreadUtil;
+import com.microapp.autumn.api.util.SpiUtil;
+import com.microapp.autumn.core.pool.AutumnPool;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,12 +33,13 @@ import lombok.extern.slf4j.Slf4j;
  * @date: 2024/10/28
  */
 @Slf4j
-public class MulticastRegistry implements Registry {
-
-
+public class MulticastRegistry implements Registry, Discovery {
     private static volatile MulticastRegistry instance;
-    private volatile AtomicLong latest = new AtomicLong(System.currentTimeMillis());
-    private volatile AtomicBoolean state = new AtomicBoolean(false);
+    private volatile AtomicInteger count = new AtomicInteger(0);
+    private MulticastSocket mc;
+    private InetAddress group;
+    private ConcurrentHashMap<String, ConsumerConfig> instances = new ConcurrentHashMap();
+    private Map<String, AtomicInteger> mapping = new ConcurrentHashMap<>();
 
     public static MulticastRegistry provider() {
         if(Objects.isNull(instance)) {
@@ -39,21 +49,147 @@ public class MulticastRegistry implements Registry {
                 }
             }
         }
+        instance.discovery();
         return instance;
+    }
+
+    private void discovery() {
+        ApplicationConfig applicationConfig = ApplicationConfig.getInstance();
+        String ip = applicationConfig.getMulticastIp();
+        Integer port = applicationConfig.getMulticastPort();
+        try {
+            if(Objects.isNull(mc)) {
+                mc = new MulticastSocket(port);
+                group = InetAddress.getByName(ip);
+            }
+            Runnable runnable = () -> {
+                handleDiscovery(mc, group, port);
+            };
+
+            Thread thread = new Thread(runnable, "autumn-multicast-discovery");
+            thread.setDaemon(true);
+            thread.start();
+            log.info("autumn-multicast-discovery begin listening, ip:{}, port:{}", ip, port);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void handleDiscovery(MulticastSocket ms, InetAddress group, Integer port) {
+        try {
+            ms.joinGroup(group);
+            byte[] buffer = new byte[8192];
+            DatagramPacket dp = new DatagramPacket(buffer, buffer.length);
+            while (!ms.isClosed()) {
+                ms.receive(dp);
+                //String ip = dp.getAddress().getHostAddress();
+                String data = new String(dp.getData(), 0, dp.getLength());
+                int i = data.indexOf('\n');
+                if (i > 0) {
+                    data = data.substring(0, i).trim();
+                }
+                Arrays.fill(buffer, (byte) 0);
+                Map<String, String> params = ConverterUtil.getUrlParams(data);
+                String protocol = params.get(ConverterUtil.CONSTANT_PROTOCOL);
+                receive(data, protocol);
+            }
+        } catch (Throwable e) {
+            if (!ms.isClosed()) {
+                log.error("multicast discovery socket is closed. exception:{}", e.getMessage());
+            }
+        }
+    }
+
+    private void receive(String data, String protocol) {
+        ConsumerConfig multicastConfig = ConverterUtil.queryStringToProvider(data);
+        ProviderConfig config = ProviderConfig.getInstance();
+        if(Objects.nonNull(config)) {
+            if(!multicastConfig.getReferences().contains(config.getName())) {
+                return;
+            }
+        }
+
+        if(MulticastEventEnum.REGISTRY.getCode().equals(protocol)) {
+            addInstance(multicastConfig);
+            SpiUtil.registry().register();
+            return;
+        }
+        if (MulticastEventEnum.SUBSCRIBE.getCode().equals(protocol)){
+            addInstance(multicastConfig);
+            return;
+        }
+        AutumnPool.getInstance().leave(multicastConfig);
+        removeInstance(multicastConfig);
+    }
+
+    @Override
+    public void watch(String name) {
+        if(mapping.containsKey(name)) {
+            return;
+        }
+
+        mapping.put(name, new AtomicInteger(0));
+    }
+
+    private void addInstance(ConsumerConfig consumerConfig) {
+        if(!mapping.containsKey(consumerConfig.getName())) {
+            return;
+        }
+
+        String hash = consumerConfig.getName().concat(":")
+                .concat(consumerConfig.getIp())
+                .concat(":")
+                .concat(consumerConfig.getPort().toString());
+        if(instances.contains(hash)) {
+            ConsumerConfig instance = instances.get(hash);
+            Integer version = instance.getVersion();
+            instance.setVersion(version);
+            instance.setLatestTime(System.currentTimeMillis());
+            return;
+        }
+        log.info("multicast discovery receive data, config:{}", consumerConfig);
+        consumerConfig.setLatestTime(System.currentTimeMillis());
+        consumerConfig.setVersion(1);
+        instances.put(hash, consumerConfig);
+    }
+
+    private void removeInstance(ConsumerConfig consumerConfig) {
+        instances.remove(consumerConfig);
+    }
+
+
+    @Override
+    public Set<String> services() {
+        Set<String> services = instances.values().stream()
+                .map(ConsumerConfig::getName)
+                .collect(Collectors.toSet());
+        return services;
+    }
+
+    @Override
+    public List<ConsumerConfig> getInstances(String name) {
+        Map<String, List<ConsumerConfig>> result = instances.values().stream()
+                .collect(Collectors.groupingBy(ConsumerConfig::getName));
+        return result.get(name);
+    }
+
+    @Override
+    public void checkHealth() {
+        instances.forEach((k, v) -> {
+            ConsumerConfig instance = v;
+            if(System.currentTimeMillis() - instance.getLatestTime() > 10 * 1000) {
+                instances.remove(k);
+                AutumnPool.getInstance().leave(v);
+            }
+        });
     }
 
 
     @Override
     public Boolean register() {
-        // avoid frequent registry
-//        if((latest.get() + 3 * 1000) > System.currentTimeMillis()) {
-//            return false;
-//        }
-//        latest.set(System.currentTimeMillis());
-        if(state.get()) {
+        if(count.get() > 3) {
             return true;
         }
-        state.compareAndSet(false, true);
         return init();
     }
 
@@ -65,25 +201,22 @@ public class MulticastRegistry implements Registry {
         Integer port = applicationConfig.getMulticastPort();
         ProviderConfig config = ProviderConfig.getInstance();
         String registryRequest = ConverterUtil.shutdownRequest(config);
-        MulticastSocket mcs = null;
-        InetAddress group = null;
+
         try {
             group = InetAddress.getByName(ip);
-            mcs = new MulticastSocket(port);
-            mcs.joinGroup(group);
             byte[] buffer = registryRequest.getBytes();
             DatagramPacket dp = new DatagramPacket(buffer, buffer.length, group, port);
-            mcs.send(dp);
+            mc.send(dp);
             Arrays.fill(buffer, (byte) 0);
         } catch (Exception e) {
-            log.warn("autumn-multicast-registry receive exception: ", e);
+            log.warn("autumn-multicast-registry shutdown exception: ", e);
         } finally {
-            if (mcs != null) {
+            if (mc != null) {
                 try {
-                    mcs.leaveGroup(group);
-                    mcs.close();
+                    mc.leaveGroup(group);
+                    mc.close();
                 } catch (IOException e) {
-                    log.warn("autumn-multicast-registry receive exception: ", e);
+                    log.warn("autumn-multicast-registry shutdown exception: ", e);
                 }
             }
         }
@@ -98,40 +231,30 @@ public class MulticastRegistry implements Registry {
         Properties properties = CommonUtil.readClasspath("application.properties");
         config.init(properties);
         log.info("autumn-multicast registry ip:{}, port:{}, config:{}", ip, port, config);
-        Runnable runnable = () -> {
-            log.info("autumn-multicast registry ip:{}, port:{}, config:{}", ip, port, config);
-            try {
-                InetAddress group = InetAddress.getByName(ip);
-                MulticastSocket mcs = new MulticastSocket(port);
-                registry(mcs, group, port, config);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        };
-
-        ThreadUtil.getInstance().scheduleWithFixedDelay(runnable, 3L);
+        registry(port, config);
         return true;
     }
 
-    private void registry(MulticastSocket ms, InetAddress group, Integer port, ProviderConfig config) {
+    private void registry(Integer port, ProviderConfig config) {
+        count.incrementAndGet();
         String registryRequest = ConverterUtil.registryRequest(config);
+        if(count.get() > 3) {
+            registryRequest = ConverterUtil.subscribeRequest(config);
+        }
         try {
-            ms.joinGroup(group);
+            if(Objects.isNull(mc)) {
+                ApplicationConfig applicationConfig = ApplicationConfig.getInstance();
+                String ip = applicationConfig.getMulticastIp();
+                mc = new MulticastSocket(port);
+                group = InetAddress.getByName(ip);
+            }
+            mc.joinGroup(group);
             byte[] buffer = registryRequest.getBytes();
             DatagramPacket dp = new DatagramPacket(buffer, buffer.length, group, port);
-            ms.send(dp);
+            mc.send(dp);
             Arrays.fill(buffer, (byte) 0);
         } catch (Exception e) {
             log.warn("autumn-multicast-registry receive exception: ", e);
-        } finally {
-            if (ms != null) {
-                try {
-                    ms.leaveGroup(group);
-                    ms.close();
-                } catch (IOException e) {
-                    log.warn("autumn-multicast-registry receive exception: ", e);
-                }
-            }
         }
     }
 }

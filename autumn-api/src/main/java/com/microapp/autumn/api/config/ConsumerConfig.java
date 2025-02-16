@@ -1,5 +1,6 @@
 package com.microapp.autumn.api.config;
 
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import lombok.Getter;
@@ -10,6 +11,7 @@ import lombok.ToString;
 @Getter
 @ToString
 public class ConsumerConfig {
+
     /**
      * reference service name
      */
@@ -26,6 +28,10 @@ public class ConsumerConfig {
      * consumer label, with label route the consumer instance.
      */
     private String label;
+    /**
+     * consumer contains references service list
+     */
+    private Set<String> references;
     /**
      * current active connection
      */

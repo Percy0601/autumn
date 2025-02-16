@@ -16,11 +16,6 @@ import com.microapp.autumn.api.config.ReferenceConfig;
 public interface Discovery {
 
     /**
-     * begin discovery watch service
-     */
-    void discovery();
-
-    /**
      * add watch service
      *
      * @param name

@@ -1,8 +1,6 @@
 package com.microapp.autumn.sample.test;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,12 +17,8 @@ import org.apache.thrift.transport.TTransport;
 import org.apache.thrift.transport.TTransportException;
 import org.junit.jupiter.api.Test;
 
-import com.microapp.autumn.api.Discovery;
-import com.microapp.autumn.api.Registry;
-import com.microapp.autumn.api.config.ConsumerConfig;
 import com.microapp.autumn.api.config.ReferenceConfig;
 import com.microapp.autumn.api.enums.RegistryTypeEnum;
-import com.microapp.autumn.api.util.SpiUtil;
 import com.microapp.autumn.core.AutumnBootstrap;
 import com.microapp.autumn.core.pool.AutumnPool;
 import com.microapp.autumn.core.pool.impl.ConcurrentBagEntry;
@@ -54,23 +48,6 @@ public class TrainingConsumerTest {
         referenceConfig.setRegistryTypeEnum(RegistryTypeEnum.MULTICAST);
         referenceConfig.setSocketTimeout(3000L);
         consumer.reference(referenceConfig);
-        List<ConsumerConfig> instances = SpiUtil.load(Discovery.class).getInstances(referenceConfig.getName());
-
-        if(Objects.isNull(instances) || instances.size() < 1) {
-            for(int i = 0; i < 3; i++) {
-                try {
-                    Thread.sleep(2000L);
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-                SpiUtil.load(Registry.class).register();
-                instances = SpiUtil.load(Discovery.class).getInstances(referenceConfig.getName());
-                if(Objects.nonNull(instances) && instances.size() > 1) {
-                    break;
-                }
-            }
-        }
-
         Runnable r = () -> {
             ConcurrentBagEntry ce = null;
             try {
