@@ -100,12 +100,12 @@ public class MulticastRegistry implements Registry, Discovery {
 
     private void receive(String data, String protocol) {
         ConsumerConfig multicastConfig = ConverterUtil.queryStringToProvider(data);
-//        ProviderConfig config = ProviderConfig.getInstance();
-//        if(Objects.nonNull(config)) {
-//            if(!multicastConfig.getReferences().contains(config.getName())) {
-//                return;
-//            }
-//        }
+        ProviderConfig config = ProviderConfig.getInstance();
+        if(Objects.nonNull(config)) {
+            if(!multicastConfig.getReferences().contains(config.getName())) {
+                return;
+            }
+        }
 
         if(MulticastEventEnum.REGISTRY.getCode().equals(protocol)) {
             addInstance(multicastConfig);
@@ -185,9 +185,6 @@ public class MulticastRegistry implements Registry, Discovery {
 
     @Override
     public Boolean register() {
-        if(count.get() > 3) {
-            return true;
-        }
         return init();
     }
 
@@ -236,7 +233,7 @@ public class MulticastRegistry implements Registry, Discovery {
     private void registry(Integer port, ProviderConfig config) {
         count.incrementAndGet();
         String registryRequest = ConverterUtil.registryRequest(config);
-        if(count.get() > 3) {
+        if(count.get() > 2) {
             registryRequest = ConverterUtil.subscribeRequest(config);
         }
         try {
