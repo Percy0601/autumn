@@ -36,10 +36,11 @@ public class MulticastDiscoveryTest {
     @Test
     void testDiscovery() {
         Discovery discovery = SpiUtil.load(Discovery.class);
-        SpiUtil.registry().register();
         discovery.watch("training-a");
+        Registry registry = SpiUtil.load(Registry.class);
+        registry.register();
         while (true) {
-            SpiUtil.registry().register();
+            registry.register();
             Set<String> services = discovery.services();
             log.info("======================begin discovery:{}, ======================", discovery.services());
             services.forEach(it -> {

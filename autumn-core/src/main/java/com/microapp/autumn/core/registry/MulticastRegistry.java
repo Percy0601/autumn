@@ -110,7 +110,7 @@ public class MulticastRegistry implements Registry, Discovery {
 
         if(MulticastEventEnum.REGISTRY.getCode().equals(protocol)) {
             addInstance(multicastConfig);
-            SpiUtil.registry().register();
+            SpiUtil.load(Registry.class).register();
             return;
         }
         if (MulticastEventEnum.SUBSCRIBE.getCode().equals(protocol)){
@@ -159,9 +159,7 @@ public class MulticastRegistry implements Registry, Discovery {
 
     @Override
     public Set<String> services() {
-        Set<String> services = instances.values().stream()
-                .map(ConsumerConfig::getName)
-                .collect(Collectors.toSet());
+        Set<String> services = mapping.keySet();
         return services;
     }
 
@@ -220,13 +218,10 @@ public class MulticastRegistry implements Registry, Discovery {
 
     private Boolean init() {
         ApplicationConfig applicationConfig = ApplicationConfig.getInstance();
-        String ip = applicationConfig.getMulticastIp();
         Integer port = applicationConfig.getMulticastPort();
-
         ProviderConfig config = ProviderConfig.getInstance();
         Properties properties = CommonUtil.readClasspath("application.properties");
         config.init(properties);
-        log.info("autumn-multicast registry ip:{}, port:{}, config:{}", ip, port, config);
         registry(port, config);
         return true;
     }
@@ -237,6 +232,7 @@ public class MulticastRegistry implements Registry, Discovery {
         if(count.get() > 2) {
             registryRequest = ConverterUtil.subscribeRequest(config);
         }
+        log.info("autumn-multicast registry ip:{}, port:{}, config:{}", config.getIp(), port, registryRequest);
         try {
             if(Objects.isNull(mc)) {
                 ApplicationConfig applicationConfig = ApplicationConfig.getInstance();

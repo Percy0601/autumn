@@ -19,11 +19,15 @@ import com.microapp.autumn.api.Registry;
  * @date: 2024/10/28
  */
 public class SpiUtil {
-    private static Map<Class, Object> mapping = new ConcurrentHashMap<>();
-    private static Map<Class, List<Object>> mappings = new ConcurrentHashMap<>();
+    private static volatile Map<Class, Object> mapping = new ConcurrentHashMap<>();
+    private static volatile Map<Class, List<Object>> mappings = new ConcurrentHashMap<>();
 
-    private static Discovery discovery;
-    private static Registry registry;
+//    private static volatile Discovery discovery;
+//    private static volatile Registry registry;
+
+    private SpiUtil() {
+
+    }
 
     public static <S> S load(Class<S> service) {
         if(mapping.containsKey(service)) {
@@ -58,31 +62,31 @@ public class SpiUtil {
         mappings.put(service, result);
         return (List<S>) result;
     }
-
-    public static Discovery discovery(){
-        if(null == discovery) {
-            ServiceLoader<Discovery> load = ServiceLoader.load(Discovery.class);
-            Iterator<Discovery> iterator = load.iterator();
-            if(!iterator.hasNext()) {
-                return null;
-            }
-            discovery = iterator.next();
-            return discovery;
-        }
-
-        return discovery;
-    }
-
-    public static Registry registry(){
-        if(null == registry) {
-            ServiceLoader<Registry> load = ServiceLoader.load(Registry.class);
-            Iterator<Registry> iterator = load.iterator();
-            if(!iterator.hasNext()) {
-                return null;
-            }
-            registry = iterator.next();
-        }
-
-        return registry;
-    }
+//
+//    public static Discovery discovery(){
+//        if(null == discovery) {
+//            ServiceLoader<Discovery> load = ServiceLoader.load(Discovery.class);
+//            Iterator<Discovery> iterator = load.iterator();
+//            if(!iterator.hasNext()) {
+//                return null;
+//            }
+//            discovery = iterator.next();
+//            return discovery;
+//        }
+//
+//        return discovery;
+//    }
+//
+//    public static Registry registry(){
+//        if(null == registry) {
+//            ServiceLoader<Registry> load = ServiceLoader.load(Registry.class);
+//            Iterator<Registry> iterator = load.iterator();
+//            if(!iterator.hasNext()) {
+//                return null;
+//            }
+//            registry = iterator.next();
+//        }
+//
+//        return registry;
+//    }
 }
