@@ -49,11 +49,11 @@ public class MulticastRegistry implements Registry, Discovery {
                 }
             }
         }
-        instance.discovery();
         return instance;
     }
 
-    private void discovery() {
+    @Override
+    public void discovery() {
         ApplicationConfig applicationConfig = ApplicationConfig.getInstance();
         String ip = applicationConfig.getMulticastIp();
         Integer port = applicationConfig.getMulticastPort();
@@ -94,20 +94,18 @@ public class MulticastRegistry implements Registry, Discovery {
                 receive(data, protocol);
             }
         } catch (Throwable e) {
-            if (!ms.isClosed()) {
-                log.error("multicast discovery socket is closed. exception:{}", e.getMessage());
-            }
+            log.error("multicast discovery socket is closed. exception:{}", e.getMessage());
         }
     }
 
     private void receive(String data, String protocol) {
         ConsumerConfig multicastConfig = ConverterUtil.queryStringToProvider(data);
-        ProviderConfig config = ProviderConfig.getInstance();
-        if(Objects.nonNull(config)) {
-            if(!multicastConfig.getReferences().contains(config.getName())) {
-                return;
-            }
-        }
+//        ProviderConfig config = ProviderConfig.getInstance();
+//        if(Objects.nonNull(config)) {
+//            if(!multicastConfig.getReferences().contains(config.getName())) {
+//                return;
+//            }
+//        }
 
         if(MulticastEventEnum.REGISTRY.getCode().equals(protocol)) {
             addInstance(multicastConfig);
@@ -175,13 +173,13 @@ public class MulticastRegistry implements Registry, Discovery {
 
     @Override
     public void checkHealth() {
-        instances.forEach((k, v) -> {
-            ConsumerConfig instance = v;
-            if(System.currentTimeMillis() - instance.getLatestTime() > 10 * 1000) {
-                instances.remove(k);
-                AutumnPool.getInstance().leave(v);
-            }
-        });
+//        instances.forEach((k, v) -> {
+//            ConsumerConfig instance = v;
+//            if(System.currentTimeMillis() - instance.getLatestTime() > 10 * 1000) {
+//                instances.remove(k);
+//                AutumnPool.getInstance().leave(v);
+//            }
+//        });
     }
 
 

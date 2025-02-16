@@ -41,4 +41,8 @@ public interface Discovery {
      */
     void checkHealth();
 
+    /**
+     * discovery reference service
+     */
+    void discovery();
 }

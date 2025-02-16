@@ -58,5 +58,10 @@ public class ConsulDiscovery implements Discovery {
 
     }
 
+    @Override
+    public void discovery() {
+
+    }
+
 
 }
