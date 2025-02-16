@@ -134,6 +134,13 @@ public class ConverterUtil {
                     .concat(config.getPort().toString())
                     .concat("&");
         }
+        Set<String> services = SpiUtil.discovery().services();
+        if(services.size() > 0) {
+            String services_str = String.join(",", services);
+            queryString = queryString.concat("references=")
+                    .concat(services_str)
+                    .concat("&");
+        }
         if(queryString.length() > 0) {
             queryString = queryString.substring(0, queryString.length() - 1);
         }
