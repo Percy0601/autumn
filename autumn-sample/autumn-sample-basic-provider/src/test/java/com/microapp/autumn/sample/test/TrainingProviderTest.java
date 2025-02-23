@@ -72,4 +72,11 @@ public class TrainingProviderTest {
         }
     }
 
+    @Test
+    void testEnv() {
+        String result = System.getProperty("spring.application.name");
+        log.info("=============={}", result);
+
+    }
+
 }

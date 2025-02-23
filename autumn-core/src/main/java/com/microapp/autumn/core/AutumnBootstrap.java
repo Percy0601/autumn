@@ -21,8 +21,9 @@ import lombok.extern.slf4j.Slf4j;
 @Setter
 @Getter
 public class AutumnBootstrap {
+
     private static volatile AutumnBootstrap instance;
-    private ApplicationConfig applicationConfig;
+
     private AutumnBootstrap() {}
 
     public static AutumnBootstrap getInstance() {

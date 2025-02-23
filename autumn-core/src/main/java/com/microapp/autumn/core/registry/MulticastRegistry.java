@@ -100,7 +100,7 @@ public class MulticastRegistry implements Registry, Discovery {
 
     private void receive(String data, String protocol) {
         ConsumerConfig multicastConfig = ConverterUtil.queryStringToProvider(data);
-        ProviderConfig config = ProviderConfig.getInstance();
+        ApplicationConfig config = ApplicationConfig.getInstance();
         if(Objects.isNull(config) || Objects.isNull(multicastConfig.getReferences())) {
             return;
         }

@@ -6,15 +6,19 @@ import java.lang.management.RuntimeMXBean;
 import java.util.Objects;
 import java.util.Properties;
 
+import org.apache.thrift.utils.StringUtils;
+
 import com.microapp.autumn.api.util.CommonUtil;
 
 import lombok.Getter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * @author: baoxin.zhao
  * @date: 2024/5/8
  */
+@Slf4j
 @Getter
 @ToString
 public class ApplicationConfig {
@@ -34,8 +38,27 @@ public class ApplicationConfig {
             synchronized (ApplicationConfig.class) {
                 if(Objects.isNull(instance)) {
                     instance = new ApplicationConfig();
+                    String appName = System.getProperty("spring.application.name");
+                    if(Objects.isNull(appName) || appName.length() < 1) {
+                        appName = System.getenv("spring.application.name");
+                    }
                     Properties properties = CommonUtil.readClasspath("application.properties");
-                    instance.init(properties);
+                    if(Objects.isNull(properties)) {
+                        log.info("application start with params: -Dspring.application.name=xxx and ensure path exist config file: /opt/autumn/xxx.properties");
+                        System.exit(0);
+                        return null;
+                    }
+                    log.info("application name is: {}", appName);
+                    instance.name = appName;
+
+                    Properties configProperties = CommonUtil.readClasspath(appName.concat(".properties"));
+                    if(Objects.isNull(properties)) {
+                        log.info("application start config file: /opt/autumn/[app].properties");
+                        System.exit(0);
+                        return null;
+                    }
+
+                    instance.init(configProperties);
                 }
             }
         }
@@ -43,24 +66,20 @@ public class ApplicationConfig {
     }
 
     public void init(Properties properties) {
-        String appName = properties.getProperty("spring.application.name");
-        if(Objects.isNull(appName) || appName.length() < 1) {
-            appName = properties.getProperty("autumn.name");
-        }
-        this.name = appName;
-        String registry_type = properties.getProperty("autumn.registry-type");
+
+        String registry_type = properties.getProperty("application.registry-type");
         if(Objects.isNull(registryType) || registryType.length() < 1) {
             registry_type = "multicast";
         }
         this.registryType = registry_type;
 
-        String multicast_ip = properties.getProperty("autumn.multicast.ip");
+        String multicast_ip = properties.getProperty("application.multicast.ip");
         if(Objects.isNull(multicast_ip) || multicast_ip.length() < 1) {
             multicast_ip = "224.0.0.1";
         }
         this.multicastIp = multicast_ip;
 
-        String multicast_port = properties.getProperty("autumn.multicast.port");
+        String multicast_port = properties.getProperty("application.multicast.port");
         if(Objects.isNull(multicast_port) || multicast_port.length() < 1) {
             multicast_port = "5555";
         }

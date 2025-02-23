@@ -7,9 +7,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import org.apache.thrift.utils.StringUtils;
-
 import com.microapp.autumn.api.Discovery;
+import com.microapp.autumn.api.config.ApplicationConfig;
 import com.microapp.autumn.api.config.ConsumerConfig;
 import com.microapp.autumn.api.config.ProviderConfig;
 import com.microapp.autumn.api.enums.MulticastEventEnum;
@@ -67,8 +66,9 @@ public class ConverterUtil {
 
 
     public static String shutdownRequest(ProviderConfig config) {
+        String name = ApplicationConfig.getInstance().getName();
         String queryString = MulticastEventEnum.SHUTDOWN.getCode().concat("://")
-                .concat(config.getName())
+                .concat(name)
                 .concat("?");
         if(Objects.nonNull(config.getIp())) {
             queryString = queryString.concat("ip=")
@@ -95,8 +95,9 @@ public class ConverterUtil {
     }
 
     public static String registryRequest(ProviderConfig config) {
+        String name = ApplicationConfig.getInstance().getName();
         String queryString = MulticastEventEnum.REGISTRY.getCode().concat("://")
-                .concat(config.getName())
+                .concat(name)
                 .concat("?");
         if(Objects.nonNull(config.getIp())) {
             queryString = queryString.concat("ip=")
@@ -122,8 +123,9 @@ public class ConverterUtil {
     }
 
     public static String subscribeRequest(ProviderConfig config) {
+        String name = ApplicationConfig.getInstance().getName();
         String queryString = MulticastEventEnum.SUBSCRIBE.getCode().concat("://")
-                .concat(config.getName())
+                .concat(name)
                 .concat("?");
         if(Objects.nonNull(config.getIp())) {
             queryString = queryString.concat("ip=")

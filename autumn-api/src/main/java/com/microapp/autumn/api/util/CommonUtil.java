@@ -93,7 +93,7 @@ public class CommonUtil {
      * read config<br>
      * <pre>
      *     1、classpath
-     *     2、/opt/config/
+     *     2、/opt/autumn/
      * </pre>
      * @param filename
      * @return
@@ -109,7 +109,7 @@ public class CommonUtil {
         URL url = CommonUtil.class.getClassLoader()
                 .getResource(filename);
         if(Objects.isNull(url)) {
-            uri = new File("/opt/config/".concat(filename)).toURI();
+            uri = new File("/opt/autumn/".concat(filename)).toURI();
         } else {
             try {
                 uri = url.toURI();
