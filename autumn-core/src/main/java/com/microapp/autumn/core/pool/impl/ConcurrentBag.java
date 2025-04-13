@@ -28,6 +28,7 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 @Slf4j
 public class ConcurrentBag implements AutoCloseable {
     private volatile boolean closed;
+    // TODO use ConcurrentLinkedDeque replace ConcurrentLinkedQueue
     private final ConcurrentLinkedQueue<ConcurrentBagEntry> sharedList = new ConcurrentLinkedQueue<>();
     private final SynchronousQueue<ConcurrentBagEntry> handoffQueue = new SynchronousQueue<>(true);
     private final AtomicInteger waiters = new AtomicInteger(0);
