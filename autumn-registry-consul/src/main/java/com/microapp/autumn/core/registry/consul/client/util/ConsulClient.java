@@ -27,6 +27,7 @@ import org.apache.hc.client5.http.ssl.SSLConnectionSocketFactory;
 import org.apache.hc.core5.http.ContentType;
 import org.apache.hc.core5.http.NameValuePair;
 import org.apache.hc.core5.http.ParseException;
+import org.apache.hc.core5.http.io.HttpClientResponseHandler;
 import org.apache.hc.core5.http.io.entity.EntityUtils;
 import org.apache.hc.core5.http.io.entity.StringEntity;
 import org.apache.hc.core5.http.message.BasicNameValuePair;
@@ -43,7 +44,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class ConsulClient {
-    public static CloseableHttpClient httpClient = null;
+    public static CloseableHttpClient httpClient;
 
     private static volatile ConsulClient instance;
     private ConsulClient() {
@@ -72,7 +73,7 @@ public class ConsulClient {
                     .build();
         } catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
             httpClient = HttpClients.createDefault();
-            log.warn("http client config exception: {}", e);
+            log.warn("http client config exception: ", e);
         }
     }
 
@@ -97,10 +98,18 @@ public class ConsulClient {
             httpPut.setUri(uri);
         }
 
+        HttpClientResponseHandler<String> responseHandler = response -> {
+            int status = response.getCode();
+            if (status >= 200 && status < 300) {
+                return EntityUtils.toString(response.getEntity());
+            } else {
+                throw new IOException("Unexpected response status: " + status);
+            }
+        };
+
         try {
-            CloseableHttpResponse response = httpClient.execute(httpPut);
-            result = EntityUtils.toString(response.getEntity());
-        } catch (IOException | ParseException e) {
+            result = httpClient.execute(httpPut, responseHandler);
+        } catch (IOException e) {
             if(log.isWarnEnabled()) {
                 log.warn("http client do-put exception:{}", e);
             }
