@@ -15,6 +15,7 @@ import java.util.Objects;
 import javax.net.ssl.SSLContext;
 
 import org.apache.hc.client5.http.classic.methods.HttpPut;
+import org.apache.hc.client5.http.config.ConnectionConfig;
 import org.apache.hc.client5.http.config.RequestConfig;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
@@ -61,7 +62,6 @@ public class ConsulClient {
 
     static {
         RequestConfig config = RequestConfig.custom()
-                .setConnectTimeout(Timeout.ofMilliseconds(3000L))
                 .setConnectionRequestTimeout(Timeout.ofMilliseconds(10000L))
                 .setResponseTimeout(Timeout.ofMilliseconds(10000L))
                 .build();
@@ -112,9 +112,13 @@ public class ConsulClient {
     private static HttpClientConnectionManager getHttpClientConnectionManager() throws NoSuchAlgorithmException,
             KeyStoreException,
             KeyManagementException {
+        ConnectionConfig connectionConfig = ConnectionConfig.custom()
+                .setConnectTimeout(Timeout.ofMilliseconds(3000L))
+                .build();
         return PoolingHttpClientConnectionManagerBuilder.create()
                 .setMaxConnTotal(50)
                 .setMaxConnPerRoute(10)
+                .setDefaultConnectionConfig(connectionConfig)
                 .setSSLSocketFactory(getSslConnectionSocketFactory())
                 .build();
     }
